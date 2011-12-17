@@ -65,3 +65,22 @@ sub split {
 }
 
 1;
+
+=pod
+
+=head1 name
+
+TaskMastery::Config - read in a taskmaster config file
+
+=head1 DESCRIPTION
+
+This module reads in task master config files and offers an API for
+accessing the data.
+
+=head1 AUTHOR
+
+Wes Hardaker <opensource@hardakers.net>
+
+=head1 LICENSE
+
+GPLv2
