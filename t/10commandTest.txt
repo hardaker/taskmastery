@@ -1,0 +1,9 @@
+[createstuff]
+  type: command
+  startup: touch t/10-startup-out
+  cleanup: echo "foo" > t/10-startup-cleanup
+
+[destroystuff]
+  type: command
+  cleanup: rm t/10-startup-out ; rm t/10-startup-cleanup
+  
