@@ -30,6 +30,42 @@ sub config {
     return $self->{'configobj'};
 }
 
+sub create_task_object {
+    my ($self, $taskname) = @_;
+    my $config = $self->config();
+    
+    # pull out the type
+    my $type = $config->get($taskname, 'type');
+
+    if (!defined($type)) {
+	croak "failed to find a task type for task '$taskname'";
+    }
+
+    # manipulate it to be a single UC char followed by the rest lc
+    $type =~ s/(.)(.*)/uc($1) . lc($2)/e;
+
+    # now create an object based on a module name of that type
+    my $obj = $self->create_object_of_type($type);
+    return $obj;
+}
+
+sub create_object_of_type {
+    my ($self, $type) = @_;
+
+    # test that we can load it
+    my $evalresult = eval "require TaskMastery::Task::$type;";
+    if (!$evalresult) {
+	croak "Failed to load an object for a task type of '$type'";
+    }
+
+    my $obj = eval "new TaskMastery::Task::$type;";
+    if (ref($obj) ne "TaskMastery::Task::$type") {
+	croak "The created object is not of the right type (expected '$type')";
+    }
+
+    return $obj;
+}
+
 1;
 
 =pod
