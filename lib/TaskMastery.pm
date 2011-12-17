@@ -38,6 +38,18 @@ sub config {
 
 TaskMastery - Base class for the taskmastery system
 
+=head1 SYNOPSIS
+
+  # create the parent object
+  my $tm = new TaskMastery();
+
+  # read in the config file
+  $tm->read_config("/path/to/foo.conf");
+
+  # run commands
+  $tm->run(name => "taskname");
+  $tm->run(tag => "tagname");
+
 =head1 AUTHOR
 
 Wes Hardaker <opensource@hardakers.net>
