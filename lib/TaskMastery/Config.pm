@@ -1,21 +1,14 @@
 package TaskMastery::Config;
 
+use TaskMastery;
 use Carp;
-
 use strict;
+
+our @ISA = qw(TaskMastery);
 
 our $VERSION = "0.1";
 
 my $DEFNAME = "__DEFAULT__";
-
-sub new {
-    my $type = shift;
-    my ($class) = ref($type) || $type;
-    my $self = {};
-    %$self = @_;
-    bless($self, $class);
-    return $self;
-}
 
 sub read_config {
     my ($self, $file) = @_;
@@ -68,7 +61,7 @@ sub split {
 
 =pod
 
-=head1 name
+=head1 NAME
 
 TaskMastery::Config - read in a taskmaster config file
 
@@ -81,6 +74,8 @@ accessing the data.
 
 Wes Hardaker <opensource@hardakers.net>
 
-=head1 LICENSE
+=head1 COPYRIGHT and LICENSE
+
+Copyright Wes Hardaker, 2011
 
 GPLv2

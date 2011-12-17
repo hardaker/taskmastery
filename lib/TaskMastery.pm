@@ -3,6 +3,8 @@ package TaskMastery;
 use Carp;
 use strict;
 
+use TaskMastery::Config;
+
 our $VERSION = "0.1";
 
 # note: many sub-modules depend on this routine as a generic new() routine
@@ -13,6 +15,19 @@ sub new {
     %$self = @_;
     bless($self, $class);
     return $self;
+}
+
+sub read_config {
+    my ($self, $object) = @_;
+    if (!defined($self->{'configobj'})) {
+	$self->{'configobj'} = new TaskMastery::Config;
+    }
+    $self->{'configobj'}->read_config($object);
+}
+
+sub config {
+    my ($self) = @_;
+    return $self->{'configobj'};
 }
 
 1;
