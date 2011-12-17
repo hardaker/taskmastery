@@ -46,6 +46,14 @@ sub create_task_object {
 
     # now create an object based on a module name of that type
     my $obj = $self->create_object_of_type($type);
+
+    # copy in the singular config object for the whole system
+    $obj->{'configobj'} = $config;
+    $obj->{'name'} = $taskname;
+
+    # let it do any initialization beyond the new() call
+    $obj->init();
+
     return $obj;
 }
 
@@ -64,6 +72,31 @@ sub create_object_of_type {
     }
 
     return $obj;
+}
+
+sub collect_tasks_by_name {
+    my ($self, $tasknames) = @_;
+    my @objects;
+    my $config = $self->config();
+
+    my $obj;
+    foreach my $taskname (@$tasknames) {
+	$obj = $self->create_task_object($taskname);
+	push @objects, $obj;
+    }
+}
+
+sub name {
+    my ($self) = @_;
+    return if (!exists($self->{'name'}));
+    return $self->{'name'};
+}
+
+sub run_tasks {
+    my ($self, $name) = @_;
+    my $obj = $self->create_task_object($name);
+    $obj->start();
+    $obj->finish();
 }
 
 1;
@@ -85,6 +118,33 @@ TaskMastery - Base class for the taskmastery system
   # run commands
   $tm->run(name => "taskname");
   $tm->run(tag => "tagname");
+
+=head1 TASK FLOW ARCHITECTURE
+
+Each task will perform the following operations.  Not all task types
+make use of them all, however.
+
+  - Run the task's init() routine
+  - Run any tasks identified by the 'before' configuration token (push to T)
+  - XXX Run any tasks identified by the 'before-tag' tag references (push to T)
+  - Run the task's startup() routine
+  - Run the task type's execute()
+  - Return to parent to have them execute()
+  - Run the task's finished() routine
+  - Run any objects in T that have finished() routines
+  - Run any 'after' references
+  - Run any 'after-tag' tag references
+  - Run the task's cleanup() routine
+
+The goal of the above complex series of steps is to allow for:
+
+  - Parent's to require actions from a child
+  - Parent's to depend on both startup and finished actions to happen
+    before and after the parent's task itself.
+
+=head1 SEE ALSO
+
+taskmastery(1)
 
 =head1 AUTHOR
 

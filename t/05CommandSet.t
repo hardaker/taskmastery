@@ -10,5 +10,6 @@ ok($tm->config()->get('task','foo') eq 'bar', 'able to read config');
 
 # create an object for the first type of test
 my $obj = $tm->create_task_object('task');
-ok(ref($obj) eq 'TaskMastery::Task::Command', "created object is the right type");
-
+ok(ref($obj) eq 'TaskMastery::Task::Command',
+   "created object is the right type");
+ok($obj->name() eq 'task', "task is properly named");

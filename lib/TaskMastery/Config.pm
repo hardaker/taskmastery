@@ -54,6 +54,7 @@ sub exact_split {
 
 sub split {
     my ($self, $token, $key, $split) = @_;
+    $split ||= ",";
     return ($self->exact_split($token, $key, "\\s*" . $split . "\\s*"));
 }
 
