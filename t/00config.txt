@@ -1,0 +1,9 @@
+value: foo
+override: this
+listval: listfoo1,listfoo2
+
+[task]
+  foo: bar
+  override: it
+  baz: it, is,multiple
+
