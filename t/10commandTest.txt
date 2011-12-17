@@ -6,4 +6,43 @@
 [destroystuff]
   type: command
   cleanup: rm t/10-startup-out ; rm t/10-startup-cleanup
+
+[parent]
+  type:     command
+  before:   beforeparent
+  after:    afterparent
+  require:  parentrequires
+
+  init:     echo -n "1" >  t/10-parent-test
+  startup:  echo -n "a" >> t/10-parent-test
+  execute:  echo -n "b" >> t/10-parent-test
+  finished: echo -n "c" >> t/10-parent-test
+  cleanup:  echo -n "d" >> t/10-parent-test
   
+[beforeparent]
+  type:     command
+  init:     echo -n "2" >> t/10-parent-test
+  startup:  echo -n "3" >> t/10-parent-test 
+  execute:  echo -n "4" >> t/10-parent-test
+  finished: echo -n "5" >> t/10-parent-test
+  cleanup:  echo -n "6" >> t/10-parent-test
+
+[parentrequires]
+  type:     command
+  init:     echo -n "7" >> t/10-parent-test
+  startup:  echo -n "8" >> t/10-parent-test 
+  execute:  echo -n "9" >> t/10-parent-test
+  finished: echo -n "e" >> t/10-parent-test
+  cleanup:  echo -n "f" >> t/10-parent-test
+
+[afterparent]
+  type:     command
+  init:     echo -n "g" >> t/10-parent-test
+  startup:  echo -n "h" >> t/10-parent-test 
+  execute:  echo -n "i" >> t/10-parent-test
+  finished: echo -n "j" >> t/10-parent-test
+  cleanup:  echo -n "k" >> t/10-parent-test
+
+[fullclean]
+  type:     command
+  execute:  rm -f t/10-parent-test

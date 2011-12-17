@@ -14,17 +14,20 @@ sub start {
 
     # find 'before' childen and execute them entirely
     $self->{'beforeobjs'} =
-	$self->collect_tasks_by_name($config->split($self->name(), 'before'));
-    foreach my $obj (@{$self->{'beforeobjs'}}) {
-	$obj->start();
-	$obj->finish();
+	$self->collect_tasks_by_name([$config->split($self->name(), 'before')]);
+    if (defined($self->{'beforeobjs'})) {
+	foreach my $obj (@{$self->{'beforeobjs'}}) {
+	    $obj->run();
+	}
     }
 
     # find 'require' childen and execute just their start routines
     $self->{'requireobjs'} =
-	$self->collect_tasks_by_name($config->split($self->name(), 'require'));
-    foreach my $obj (@{$self->{'requireobjs'}}) {
-	$obj->start();
+	$self->collect_tasks_by_name([$config->split($self->name(), 'require')]);
+    if (defined($self->{'requireobjs'})) {
+	foreach my $obj (@{$self->{'requireobjs'}}) {
+	    $obj->start();
+	}
     }
 
     # run our own startup/execute functions
@@ -42,16 +45,19 @@ sub finish {
     $self->cleanup();
 
     # then call the require's
-    foreach my $obj (@{$self->{'requireobjs'}}) {
-	$obj->finish();
+    if (defined($self->{'requireobjs'})) {
+	foreach my $obj (@{$self->{'requireobjs'}}) {
+	    $obj->finish();
+	}
     }
 
     # then call any 'after' tasks and execute them entirely
     $self->{'afterobjs'} =
-	$self->collect_tasks_by_name($config->split($self->name(), 'after'));
-    foreach my $obj (@{$self->{'afterobjs'}}) {
-	$obj->start();
-	$obj->finish();
+	$self->collect_tasks_by_name([$config->split($self->name(), 'after')]);
+    if (defined($self->{'afterobjs'})) {
+	foreach my $obj (@{$self->{'afterobjs'}}) {
+	    $obj->run();
+	}
     }
 }
 

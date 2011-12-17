@@ -84,6 +84,7 @@ sub collect_tasks_by_name {
 	$obj = $self->create_task_object($taskname);
 	push @objects, $obj;
     }
+    return \@objects;
 }
 
 sub name {
@@ -95,8 +96,7 @@ sub name {
 sub run_tasks {
     my ($self, $name) = @_;
     my $obj = $self->create_task_object($name);
-    $obj->start();
-    $obj->finish();
+    $obj->run();
 }
 
 1;
