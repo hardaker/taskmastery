@@ -1,4 +1,4 @@
-package SyncManager::Config;
+package TaskMastery::Config;
 
 use Carp;
 
@@ -22,7 +22,7 @@ sub read_config {
 
     my $token = $DEFNAME;
 
-    $file ||= "$ENV{HOME}/.syncmanager";
+    $file ||= "$ENV{HOME}/.taskmastery";
     
     open(I, "$file") || croak("failed to open $file");
     while(<I>) {

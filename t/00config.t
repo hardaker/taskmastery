@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 use Test::More qw(no_plan);
-BEGIN { use_ok('SyncManager::Config'); }
-require_ok('SyncManager::Config');
+BEGIN { use_ok('TaskMastery::Config'); }
+require_ok('TaskMastery::Config');
 
-my $config = new SyncManager::Config();
+my $config = new TaskMastery::Config();
 ok(defined($config), "created a config object");
-ok(ref($config) eq 'SyncManager::Config', "created a refed config object");
+ok(ref($config) eq 'TaskMastery::Config', "created a refed config object");
 
 $config->read_config("t/00config.txt");
 ok(defined($config->{'config'}), "created internal config data");
