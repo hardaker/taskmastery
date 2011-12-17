@@ -21,3 +21,13 @@ ok($array[0] eq 'it', 	    "1st object split is right");
 ok($array[1] eq 'is', 	    "2nd object split is right");
 ok($array[2] eq 'multiple', "3rd object split is right");
 
+#### default value tests
+ok($config->get('task', 'value') eq 'foo', "basic default value");
+ok($config->get('__DEFAULT__', 'override') eq 'this',
+   "the core default value was in fact 'this'");
+
+@array = $config->split('task', 'listval', ',');
+ok($#array == 1, "split default list into 2 pieces");
+ok($array[0] eq 'listfoo1', "1st default object split is right");
+ok($array[1] eq 'listfoo2', "2nd default object split is right");
+

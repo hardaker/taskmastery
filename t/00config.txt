@@ -1,6 +1,6 @@
 value: foo
 override: this
-listval: listfoo1,listfoo2
+listval: listfoo1        ,                     listfoo2
 
 [task]
   foo: bar

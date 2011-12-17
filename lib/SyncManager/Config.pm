@@ -6,6 +6,8 @@ use strict;
 
 our $VERSION = "0.1";
 
+my $DEFNAME = "__DEFAULT__";
+
 sub new {
     my $type = shift;
     my ($class) = ref($type) || $type;
@@ -18,7 +20,7 @@ sub new {
 sub read_config {
     my ($self, $file) = @_;
 
-    my $token = "__DEFAULT__";
+    my $token = $DEFNAME;
 
     $file ||= "$ENV{HOME}/.syncmanager";
     
@@ -36,8 +38,19 @@ sub read_config {
 sub get {
     my ($self, $token, $key) = @_;
     return if (!exists($self->{'config'}{$token})); # don't auto-create
-    return $self->{'config'}{$token}{$key};
-}
+
+    # return the value if we have it
+    if (exists($self->{'config'}{$token}{$key})) {
+	return $self->{'config'}{$token}{$key};
+    }
+
+    # else fall back to a default value, if possible
+    return if (!exists($self->{'config'}{$DEFNAME}));
+
+    return if (!exists($self->{'config'}{$DEFNAME}{$key}));
+
+    return $self->{'config'}{$DEFNAME}{$key};
+}    
 
 sub exact_split {
     my ($self, $token, $key, $split) = @_;
@@ -48,7 +61,7 @@ sub exact_split {
 
 sub split {
     my ($self, $token, $key, $split) = @_;
-    return ($self->exact_split($token, $key, $split . "\\s*"));
+    return ($self->exact_split($token, $key, "\\s*" . $split . "\\s*"));
 }
 
 1;
