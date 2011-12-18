@@ -21,6 +21,7 @@ sub read_config {
     open(I, "$file") || croak("failed to open $file");
     while(<I>) {
 	next if (/^\s*#/);
+	next if (/^\s*$/);
 
 	# matches lines like " [foo] "
 	if (/^\s*\[(.*)\]\s*$/) {
