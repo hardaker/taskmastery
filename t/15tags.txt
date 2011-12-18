@@ -1,0 +1,23 @@
+[parenttask]
+  type:     command
+  require:  tag:secondtag
+
+[task1]
+  type:     command
+  execute:  echo -n "a" >> t/15-tag-test
+  tag:      atag,secondtag
+
+[task2]
+  type:     command
+  execute:  echo -n "b" >> t/15-tag-test
+  tag:      atag
+
+[task3]
+  type:     command
+  execute:  echo -n "c" >> t/15-tag-test
+  tag:      secondtag,atag,anothertag
+
+[cleanuptask]
+  type:     command
+  execute:  rm -f t/15-tag-test
+  tag:      footag,cleanup,anothertag
