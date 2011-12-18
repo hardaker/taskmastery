@@ -81,8 +81,23 @@ sub collect_tasks_by_name {
 
     my $obj;
     foreach my $taskname (@$tasknames) {
-	$obj = $self->create_task_object($taskname);
-	push @objects, $obj;
+	# if a name is prefixed by a 'tag:' string then it should collect 
+	# everything it can find that is tagged.
+
+	if ($taskname =~ /tag:\s*(.*)/) {
+	    my $tag = $1;
+	    foreach my $name (@{$config->get_names()}) {
+		foreach my $tasktag ($config->split($name, 'tag')) {
+		    if ($tasktag eq $tag) {
+			push @objects, $self->create_task_object($name);
+			last;
+		    }
+		}
+	    }
+	} else {
+	    $obj = $self->create_task_object($taskname);
+	    push @objects, $obj;
+	}
     }
     return \@objects;
 }
@@ -95,8 +110,8 @@ sub name {
 
 sub run_tasks {
     my ($self, @tasks) = @_;
-    foreach my $name (@tasks) {
-	my $obj = $self->create_task_object($name);
+    my $objs = $self->collect_tasks_by_name(\@tasks);
+    foreach my $obj (@$objs) {
 	$obj->run();
     }
 }

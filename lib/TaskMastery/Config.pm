@@ -14,6 +14,7 @@ sub read_config {
     my ($self, $file) = @_;
 
     my $token = $DEFNAME;
+    my $config_order = 1;
 
     $file ||= "$ENV{HOME}/.taskmastery";
     
@@ -22,6 +23,7 @@ sub read_config {
 	# matches lines like " [foo] "
 	if (/^\s*\[(.*)\]\s*$/) {
 	    $token = $1;
+	    $self->{'config'}{$token}{'__order'} = $config_order++;
 	} elsif (/^\s*(\w+):\s*(.*)/) {
 	    $self->{'config'}{$token}{$1} = $2;
 	}
@@ -56,6 +58,13 @@ sub split {
     my ($self, $token, $key, $split) = @_;
     $split ||= ",";
     return ($self->exact_split($token, $key, "\\s*" . $split . "\\s*"));
+}
+
+sub get_names {
+    my ($self) = @_;
+    my $config = $self->{'config'};
+    return [sort { $config->{$a}{'__order'} <=> $config->{$b}{'__order'} }
+	    keys(%{$config})];
 }
 
 1;
