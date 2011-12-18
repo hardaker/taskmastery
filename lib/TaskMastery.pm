@@ -94,9 +94,11 @@ sub name {
 }
 
 sub run_tasks {
-    my ($self, $name) = @_;
-    my $obj = $self->create_task_object($name);
-    $obj->run();
+    my ($self, @tasks) = @_;
+    foreach my $name (@tasks) {
+	my $obj = $self->create_task_object($name);
+	$obj->run();
+    }
 }
 
 1;
@@ -135,6 +137,15 @@ make use of them all, however.
   - Run any 'after' references
   - Run any 'after-tag' tag references
   - Run the task's cleanup() routine
+
+Or more condensed:
+
+ - task's init:
+ - run everithing in before:
+ - run startup/execute in require:
+ - run execute, finished
+ - run execute/finished in require:
+ - run everything in after:
 
 The goal of the above complex series of steps is to allow for:
 

@@ -1,3 +1,9 @@
 #!/usr/bin/perl
 
-use TaskMastery::Config;
+use TaskMastery;
+
+$tm = new TaskMastery();
+$tm->read_config();
+
+$tm->run_tasks(@ARGV);
+
