@@ -1,6 +1,6 @@
 [parenttask]
   type:     command
-  require:  tag:secondtag
+  require:  tag:secondtag,task2
 
 [task1]
   type:     command

@@ -14,6 +14,9 @@ ok(`cat t/15-tag-test` eq "abc", "tag content is correct");
 $tm->run_tasks('tag:cleanup');
 ok(! -f "t/15-tag-test", "tag:cleanup command removed the output correctly");
 
-$tm->run_tasks('tag:secondtag');
+$tm->run_tasks('parenttask');
 ok(-f "t/15-tag-test", "startup parenttask tag-run worked");
-ok(`cat t/15-tag-test` eq "ac", "parenttask tag content is correct");
+ok(`cat t/15-tag-test` eq "acb", "parenttask tag content is correct");
+
+$tm->run_tasks('tag:cleanup');
+ok(! -f "t/15-tag-test", "tag:cleanup command removed the output correctly");
