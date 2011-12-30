@@ -10,18 +10,17 @@ our @ISA = qw(TaskMastery);
 sub start {
     my ($self) = @_;
 
+    return if ($self->{'stoppedat'});
+
     my $config = $self->config();
-    my $onfailure = $config->get($self->name(), 'onfailure');
 
     # find 'before' childen and execute them entirely
     $self->{'beforeobjs'} =
 	$self->collect_tasks_by_name([$config->split($self->name(), 'before')]);
     if (defined($self->{'beforeobjs'})) {
 	foreach my $obj (@{$self->{'beforeobjs'}}) {
-	    if ($obj->run()) {
-		if ($onfailure eq 'stop') {
-		    return 1;
-		}
+	    if ($obj->run() && $self->fail('beforeobjs::run')) {
+		return 1;
 	    }
 	}
     }
@@ -31,46 +30,39 @@ sub start {
 	$self->collect_tasks_by_name([$config->split($self->name(), 'require')]);
     if (defined($self->{'requireobjs'})) {
 	foreach my $obj (@{$self->{'requireobjs'}}) {
-	    if ($obj->start()) {
-		if ($onfailure eq 'stop') {
-		    return 1;
-		}
+	    if ($obj->start() && $self->fail('requireobjs::start')) {
+		return 1;
 	    }
 	}
     }
 
     # run our own startup/execute functions
-    if ($self->startup() && $onfailure eq 'stop') {
+    if ($self->startup() && $self->fail('startup')) {
 	return 1;
     }
-    return $self->execute();
+    return $self->execute() && $self->fail("execute");
 }
 
 sub finish {
     my ($self) = @_;
 
+    return if ($self->{'stoppedat'});
+
     my $config = $self->config();
-    my $onfailure = $config->get($self->name(), 'onfailure');
 
     # finish the execution by calling our own finish/cleanup first
-    if ($self->finished()) {
-	if ($onfailure eq 'stop') {
-	    return 1;
-	}
+    if ($self->finished() && $self->fail('finished')) {
+	return 1;
     }
 
     # then call the require's finish and clean
     if (defined($self->{'requireobjs'})) {
 	foreach my $obj (@{$self->{'requireobjs'}}) {
-	    if ($obj->finish()) {
-		if ($onfailure eq 'stop') {
-		    return 1;
-		}
+	    if ($obj->finish() && $self->fail('requireobjs::finish')) {
+		return 1;
 	    }
-	    if ($obj->clean()) {
-		if ($onfailure eq 'stop') {
-		    return 1;
-		}
+	    if ($obj->clean() && $self->fail('beforeobjs::clean')) {
+		return 1;
 	    }
 	}
     }
@@ -80,10 +72,8 @@ sub finish {
 	$self->collect_tasks_by_name([$config->split($self->name(), 'after')]);
     if (defined($self->{'afterobjs'})) {
 	foreach my $obj (@{$self->{'afterobjs'}}) {
-	    if ($obj->run()) {
-		if ($onfailure eq 'stop') {
-		    return 1;
-		}
+	    if ($obj->run() && $self->fail('afterobjs::run')) {
+		return 1;
 	    }
 	}
     }
@@ -92,27 +82,43 @@ sub finish {
 sub clean {
     my ($self) = @_;
 
+    return if ($self->{'stoppedat'});
+
     # final cleanup step calling only our own cleanup function
-    return $self->cleanup();
+    return $self->cleanup() && $self->fail("cleanup");
 }
 
 sub run {
     my ($self) = @_;
 
     my $config = $self->config();
-    my $onfailure = $config->get($self->name(), 'onfailure');
 
-    if ($self->start()) {
-	if ($onfailure eq 'stop') {
-	    return 1;
-	}
+    if ($self->start() && $self->fail('start')) {
+	return 1;
     }
-    if ($self->finish()) {
-	if ($onfailure eq 'stop') {
-	    return 1;
-	}
+    if ($self->finish() && $self->fail('finish')) {
+	return 1;
     }
-    return $self->clean();
+    return $self->clean() && $self->fail("clean");
+}
+
+sub fail {
+    my ($self, $spot) = @_;
+
+    my $config = $self->config();
+    my $onfailure = $config->get($self->name(), 'onfailure', 'continue');
+    my $silent = $config->get($self->name(), 'silent');
+
+    if (!defined($silent) && $silent ne '1' && $silent ne "yes") {
+	print STDERR "task $self->{name}::$spot failed (action: $onfailure)\n";
+    }
+    $self->{'failure_' . $spot} = 1;
+
+    if ($onfailure eq 'stop') {
+	$self->{'stoppedat'} = $spot;
+	return 1;
+    }
+    return 0;
 }
 
 # everyone should do this at least

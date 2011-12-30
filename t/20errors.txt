@@ -1,0 +1,27 @@
+silent: 1
+
+[parenttask]
+  type:      command
+  init:      echo -n "pa-" >  t/20-error-test
+  require:   task1,task2
+  execute:   echo -n "pb-" >> t/20-error-test
+  cleanup:   echo -n "pc-" >> t/20-error-test
+
+[task1]
+  type:      command
+  init:      echo -n "a-" >> t/20-error-test
+  execute:   echo -n "b-" >> t/20-error-test && exit 1
+  finished:  echo -n "c-" >> t/20-error-test
+  cleanup:   echo -n "d-" >> t/20-error-test
+  onfailure: stop
+
+[task2]
+  type:      command
+  init:      echo -n "1-" >> t/20-error-test
+  execute:   echo -n "2-" >> t/20-error-test && exit 1
+  finished:  echo -n "3-" >> t/20-error-test
+  cleanup:   echo -n "4-" >> t/20-error-test
+
+[cleanup]
+  type:      command
+  execute:   rm -f t/20-error-test
