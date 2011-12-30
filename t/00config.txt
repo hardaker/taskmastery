@@ -1,10 +1,10 @@
 value: foo
 override: this
-listval: listfoo1        ,                     listfoo2
+listval    =  listfoo1        ,                     listfoo2
 
 [task]
   type: command
-  foo: bar
-  override: it
+  foo   : bar
+  override=it
   baz: it, is,multiple
 
