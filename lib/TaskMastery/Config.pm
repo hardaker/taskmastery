@@ -19,7 +19,8 @@ sub read_config {
 
     # set some global starting defaults
     $self->{'config'}{$DEFNAME} = {
-	'directory' => getcwd(),
+	'directory'   => getcwd(),
+	'interactive' => can_be_interactive(),
 	'__order' => $config_order++,
     };
 
@@ -60,6 +61,12 @@ sub get {
     return $default;
 }    
 
+sub set {
+    my ($self, $token, $key, $value) = @_;
+    $self->{'config'}{$token}{$key} = $value;
+}
+
+
 sub exact_split {
     my ($self, $token, $key, $split) = @_;
     my $val = $self->get($token, $key);
@@ -80,6 +87,10 @@ sub get_names {
 	    keys(%{$config})];
 }
 
+sub can_be_interactive {
+  return -t STDIN && -t STDOUT;
+}
+    
 1;
 
 =pod
