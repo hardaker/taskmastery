@@ -50,7 +50,7 @@ sub run_commands_for {
 
 =head1 NAME
 
-TaskMastery::Task::Commands - Executes Commands
+TaskMastery::Task::Command - Executes Commands
 
 =head1 AUTHOR
 
