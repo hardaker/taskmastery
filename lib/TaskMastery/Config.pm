@@ -3,6 +3,7 @@ package TaskMastery::Config;
 use TaskMastery;
 use Carp;
 use strict;
+use Cwd;
 
 our @ISA = qw(TaskMastery);
 
@@ -16,6 +17,13 @@ sub read_config {
     my $token = $DEFNAME;
     my $config_order = 1;
 
+    # set some global starting defaults
+    $self->{'config'}{$DEFNAME} = {
+	'directory' => getcwd(),
+	'__order' => $config_order++,
+    };
+
+    # read in the config file
     $file ||= "$ENV{HOME}/.taskmastery";
     
     open(I, "$file") || croak("failed to open $file");
