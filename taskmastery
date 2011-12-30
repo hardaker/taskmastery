@@ -1,16 +1,19 @@
 #!/usr/bin/perl
 
 use TaskMastery;
+use strict;
 
 our $VERSION = '0.1';
+our %opts = (c => $ENV{'HOME'} . "/.taskmastery");
 
 LocalGetOptions(\%opts,
+	   ["c|config-file=s","config file to read in (default: ~/.taskmastry)"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
 
-$tm = new TaskMastery();
-$tm->read_config();
+my $tm = new TaskMastery();
+$tm->read_config($opts{'c'});
 
 $tm->run_tasks(@ARGV);
 
