@@ -27,7 +27,7 @@ sub read_config {
 	if (/^\s*\[(.*)\]\s*$/) {
 	    $token = $1;
 	    $self->{'config'}{$token}{'__order'} = $config_order++;
-	} elsif (/^\s*(\w+):\s*(.*)/) {
+	} elsif (/^\s*(\w+)[:=]\s*(.*)/) {
 	    $self->{'config'}{$token}{$1} = $2;
 	}
     }
