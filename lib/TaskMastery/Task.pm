@@ -119,7 +119,7 @@ sub fail {
     my ($self, $spot) = @_;
 
     my $config = $self->config();
-    my $onfailure = $config->get($self->name(), 'onfailure', 'continue');
+    my $onfailure = $config->get($self->name(), 'onfailure', 'prompt');
     my $silent = $config->get($self->name(), 'silent');
 
     if (!defined($silent) && $silent ne '1' && $silent ne "yes") {
@@ -130,6 +130,25 @@ sub fail {
     if ($onfailure eq 'stop') {
 	$self->{'stoppedat'} = $spot;
 	return 1;
+    }
+    if ($onfailure eq 'prompt') {
+	my $ans = $self->get_crq("Spot:\t$spot");
+	if ($ans eq 'q') {
+	    print "Quitting at your your request...\n";
+	    exit(1);
+	}
+	if ($ans eq 'c' || $ans eq '-') {
+	    # the default is to continue; forced stop onfailure contions
+	    # are caught before this (above), which means we can
+	    # safely continue at this point.
+	    return 0; # ignore the error
+	}
+	if ($ans eq 's') {
+	    # force stopping of this task
+	    $config->set($self->name(), 'onfailure', 'stop');
+	    return 1;
+	}
+	return -1;    # retry
     }
     return 0;
 }
