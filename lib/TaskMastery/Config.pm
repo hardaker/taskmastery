@@ -34,7 +34,7 @@ sub read_config {
 }
 
 sub get {
-    my ($self, $token, $key) = @_;
+    my ($self, $token, $key, $default) = @_;
     return if (!exists($self->{'config'}{$token})); # don't auto-create
 
     # return the value if we have it
@@ -43,11 +43,13 @@ sub get {
     }
 
     # else fall back to a default value, if possible
-    return if (!exists($self->{'config'}{$DEFNAME}));
+    if (exists($self->{'config'}{$DEFNAME}) &&
+	exists($self->{'config'}{$DEFNAME}{$key})) {
+	return $self->{'config'}{$DEFNAME}{$key};
+    }
 
-    return if (!exists($self->{'config'}{$DEFNAME}{$key}));
-
-    return $self->{'config'}{$DEFNAME}{$key};
+    # finally fall back to the supplied default
+    return $default;
 }    
 
 sub exact_split {
