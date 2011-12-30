@@ -2,6 +2,7 @@ package TaskMastery;
 
 use Carp;
 use strict;
+use Cwd;
 
 use TaskMastery::Config;
 
@@ -113,6 +114,46 @@ sub run_tasks {
     my $objs = $self->collect_tasks_by_name(\@tasks);
     foreach my $obj (@$objs) {
 	$obj->run();
+    }
+}
+
+sub get_input {
+    my ($self, $prompt) = @_;
+    print "$prompt " if ($prompt);
+    my $bogus = <STDIN>;
+    chomp($bogus);
+    return $bogus;
+}
+
+sub get_crq {
+    my ($self, $description, $prompt, $validitytest) = @_;
+
+    my $config = $self->config();
+    if (! $config->get($self->name(), 'interactive')) {
+	return '-';
+    }
+
+    print "----------------------------------------\n";
+    print "Failure!\n";
+    print "Task:\t\t"      . $self->name() . "\n";
+    print "Directory:\t" . getcwd() . "\n";
+    print "$description\n" if ($description);
+
+    while (1) {
+	my $input =
+	    $self->get_input($prompt || "Retry, Continue, Stop this task, Quit (r,c,s,q): ");
+	if ($validitytest) {
+	    $input =~ lc($input);
+	    if ($input =~ /$validitytest/) {
+		return $input;
+	    }
+	} else {
+	    return 'r' if ($input =~ /^r/i);
+	    return 'c' if ($input =~ /^c/i);
+	    return 'q' if ($input =~ /^q/i);
+	    return 's' if ($input =~ /^s/i);
+	}
+	print "Error: invalid input\n";
     }
 }
 
