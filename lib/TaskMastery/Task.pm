@@ -7,12 +7,21 @@ use strict;
 our $VERSION = "0.1";
 our @ISA = qw(TaskMastery);
 
+sub set_directory {
+    my ($self) = @_;
+    my $config = $self->config();
+    my $directory = $config->get($self->name(), 'directory');
+    chdir($directory) if (defined($directory) && $directory ne '');
+}
+
 sub start {
     my ($self) = @_;
 
     return if ($self->{'stoppedat'});
 
     my $config = $self->config();
+
+    $self->set_directory();
 
     # find 'before' childen and execute them entirely
     $self->{'beforeobjs'} =
@@ -50,6 +59,8 @@ sub finish {
 
     my $config = $self->config();
 
+    $self->set_directory();
+
     # finish the execution by calling our own finish/cleanup first
     if ($self->finished() && $self->fail('finished')) {
 	return 1;
@@ -83,6 +94,8 @@ sub clean {
     my ($self) = @_;
 
     return if ($self->{'stoppedat'});
+
+    $self->set_directory();
 
     # final cleanup step calling only our own cleanup function
     return $self->cleanup() && $self->fail("cleanup");
