@@ -11,13 +11,18 @@ sub start {
     my ($self) = @_;
 
     my $config = $self->config();
+    my $onfailure = $config->get($self->name(), 'onfailure');
 
     # find 'before' childen and execute them entirely
     $self->{'beforeobjs'} =
 	$self->collect_tasks_by_name([$config->split($self->name(), 'before')]);
     if (defined($self->{'beforeobjs'})) {
 	foreach my $obj (@{$self->{'beforeobjs'}}) {
-	    $obj->run();
+	    if ($obj->run()) {
+		if ($onfailure eq 'stop') {
+		    return 1;
+		}
+	    }
 	}
     }
 
@@ -26,28 +31,47 @@ sub start {
 	$self->collect_tasks_by_name([$config->split($self->name(), 'require')]);
     if (defined($self->{'requireobjs'})) {
 	foreach my $obj (@{$self->{'requireobjs'}}) {
-	    $obj->start();
+	    if ($obj->start()) {
+		if ($onfailure eq 'stop') {
+		    return 1;
+		}
+	    }
 	}
     }
 
     # run our own startup/execute functions
-    $self->startup();
-    $self->execute();
+    if ($self->startup() && $onfailure eq 'stop') {
+	return 1;
+    }
+    return $self->execute();
 }
 
 sub finish {
     my ($self) = @_;
 
     my $config = $self->config();
+    my $onfailure = $config->get($self->name(), 'onfailure');
 
     # finish the execution by calling our own finish/cleanup first
-    $self->finished();
+    if ($self->finished()) {
+	if ($onfailure eq 'stop') {
+	    return 1;
+	}
+    }
 
     # then call the require's finish and clean
     if (defined($self->{'requireobjs'})) {
 	foreach my $obj (@{$self->{'requireobjs'}}) {
-	    $obj->finish();
-	    $obj->clean();
+	    if ($obj->finish()) {
+		if ($onfailure eq 'stop') {
+		    return 1;
+		}
+	    }
+	    if ($obj->clean()) {
+		if ($onfailure eq 'stop') {
+		    return 1;
+		}
+	    }
 	}
     }
 
@@ -56,7 +80,11 @@ sub finish {
 	$self->collect_tasks_by_name([$config->split($self->name(), 'after')]);
     if (defined($self->{'afterobjs'})) {
 	foreach my $obj (@{$self->{'afterobjs'}}) {
-	    $obj->run();
+	    if ($obj->run()) {
+		if ($onfailure eq 'stop') {
+		    return 1;
+		}
+	    }
 	}
     }
 }
@@ -64,17 +92,27 @@ sub finish {
 sub clean {
     my ($self) = @_;
 
-    my $config = $self->config();
-
     # final cleanup step calling only our own cleanup function
-    $self->cleanup();
+    return $self->cleanup();
 }
 
 sub run {
     my ($self) = @_;
-    $self->start();
-    $self->finish();
-    $self->clean();
+
+    my $config = $self->config();
+    my $onfailure = $config->get($self->name(), 'onfailure');
+
+    if ($self->start()) {
+	if ($onfailure eq 'stop') {
+	    return 1;
+	}
+    }
+    if ($self->finish()) {
+	if ($onfailure eq 'stop') {
+	    return 1;
+	}
+    }
+    return $self->clean();
 }
 
 # everyone should do this at least
