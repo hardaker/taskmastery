@@ -146,7 +146,7 @@ make use of them all, however.
   - XXX Run any tasks identified by the 'before-tag' tag references (push to T)
   - Run the task's startup() routine
   - Run the task type's execute()
-  - Return to parent to have them execute()
+  - Return to parent to have them execute(), and finished()
   - Run the task's finished() routine
   - Run any objects in T that have finished() routines
   - Run any 'after' references
@@ -159,14 +159,57 @@ Or more condensed:
  - run everithing in before:
  - run startup/execute in require:
  - run execute, finished
- - run execute/finished in require:
+ - run execute/finished/cleanup in require:
  - run everything in after:
+ - run cleanup
 
 The goal of the above complex series of steps is to allow for:
 
   - Parent's to require actions from a child
   - Parent's to depend on both startup and finished actions to happen
     before and after the parent's task itself.
+
+A broken down example containing one parent and children:
+
+  - parent's init()
+    # before tasks
+    - before child1's init()
+    - before child1's startup()
+    - before child1's execute()
+    - before child1's finished()
+    - before child1's cleanup()
+    - before child2's init()
+    - before child2's startup()
+    - before child2's execute()
+    - before child2's finished()
+    - before child2's cleanup()
+    # require tasks
+    - require child1's init()
+    - require child1's startup()
+    - require child1's execute()
+    - require child2's init()
+    - require child2's startup()
+    - require child2's execute()
+  - parent's startup()
+  - parent's execute()
+  - parent's finished()
+    # require tasks wrapup
+    - require child1's finished()
+    - require child1's cleanup()
+    - require child2's finished()
+    - require child2's cleanup()
+    # after tasks
+    - after child1's init()
+    - after child1's startup()
+    - after child1's execute()
+    - after child1's finished()
+    - after child1's cleanup()
+    - after child2's init()
+    - after child2's startup()
+    - after child2's execute()
+    - after child2's finished()
+    - after child2's cleanup()
+  - parent's cleanup()
 
 =head1 SEE ALSO
 

@@ -10,27 +10,27 @@ our $VERSION = "0.1";
 
 sub init {
     my ($self) = @_;
-    $self->run_commands_for('init');
+    return $self->run_commands_for('init');
 }
 
 sub startup {
     my ($self) = @_;
-    $self->run_commands_for('startup');
+    return $self->run_commands_for('startup');
 }
 
 sub execute {
     my ($self) = @_;
-    $self->run_commands_for('execute');
+    return $self->run_commands_for('execute');
 }
 
 sub finished {
     my ($self) = @_;
-    $self->run_commands_for('finished');
+    return $self->run_commands_for('finished');
 }
 
 sub cleanup {
     my ($self) = @_;
-    $self->run_commands_for('cleanup');
+    return $self->run_commands_for('cleanup');
 }
 
 sub run_commands_for {
@@ -38,9 +38,13 @@ sub run_commands_for {
     my $config = $self->config();
     my $splitter = $config->get($self->name(), 'break') || ";";
     my @commands = $config->split($self->name(), $what, ";");
+
+    my $return = 0;
     foreach my $command (@commands) {
 	system($command);
+	$return = 1 if ($? != 0);
     }
+    return $return;
 }
 
 

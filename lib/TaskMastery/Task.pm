@@ -42,12 +42,12 @@ sub finish {
 
     # finish the execution by calling our own finish/cleanup first
     $self->finished();
-    $self->cleanup();
 
-    # then call the require's
+    # then call the require's finish and clean
     if (defined($self->{'requireobjs'})) {
 	foreach my $obj (@{$self->{'requireobjs'}}) {
 	    $obj->finish();
+	    $obj->clean();
 	}
     }
 
@@ -61,10 +61,20 @@ sub finish {
     }
 }
 
+sub clean {
+    my ($self) = @_;
+
+    my $config = $self->config();
+
+    # final cleanup step calling only our own cleanup function
+    $self->cleanup();
+}
+
 sub run {
     my ($self) = @_;
     $self->start();
     $self->finish();
+    $self->clean();
 }
 
 # everyone should do this at least
