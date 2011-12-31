@@ -1,0 +1,37 @@
+silent: 1
+
+[parenttask]
+  type:      command
+  require:   container1, container2
+  init:      echo -n "pi-" > t/25-multi-test
+  execute:   echo -n "p-" >> t/25-multi-test
+
+# both of these require task1 and task2
+[container1]
+  type:      command
+  execute:   echo -n "c1-" >> t/25-multi-test && exit 1
+  require:   task1, task2
+
+[container2]
+  type:      command
+  execute:   echo -n "c2-" >> t/25-multi-test && exit 1
+  require:   task1, task2
+
+# this will execute multiple times
+[task1]
+  type:      command
+  execute:   echo -n "t1-" >> t/25-multi-test && exit 1
+  finished:  echo -n "t1f-" >> t/25-multi-test && exit 1
+  cleanup:   echo -n "t1c-" >> t/25-multi-test && exit 1
+  multiple:  1
+
+# this will only execute once
+[task2]
+  type:      command
+  execute:   echo -n "t2-" >> t/25-multi-test && exit 1
+  finished:  echo -n "t2f-" >> t/25-multi-test && exit 1
+  cleanup:   echo -n "t2c-" >> t/25-multi-test && exit 1
+
+[cleanup]
+  type:      command
+  execute:   rm -f t/25-multi-test

@@ -66,7 +66,6 @@ sub set {
     $self->{'config'}{$token}{$key} = $value;
 }
 
-
 sub exact_split {
     my ($self, $token, $key, $split) = @_;
     my $val = $self->get($token, $key);

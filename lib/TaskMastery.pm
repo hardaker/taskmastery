@@ -8,6 +8,8 @@ use TaskMastery::Config;
 
 our $VERSION = "0.1";
 
+our %tasks; # stores the already created tasks
+
 # note: many sub-modules depend on this routine as a generic new() routine
 sub new {
     my $type = shift;
@@ -34,6 +36,11 @@ sub config {
 sub create_task_object {
     my ($self, $taskname) = @_;
     my $config = $self->config();
+
+    if (exists($self->{'tasks'}{$taskname}) &&
+	!$config->get($taskname, 'multiple')) {
+	return $self->{'tasks'}{$taskname};
+    }
     
     # pull out the type
     my $type = $config->get($taskname, 'type');
@@ -51,9 +58,12 @@ sub create_task_object {
     # copy in the singular config object for the whole system
     $obj->{'configobj'} = $config;
     $obj->{'name'} = $taskname;
+    $obj->{'tasks'} = $self->{'tasks'};
 
     # let it do any initialization beyond the new() call
     $obj->init();
+
+    $self->{'tasks'}{$taskname} = $obj;
 
     return $obj;
 }
@@ -115,6 +125,12 @@ sub run_tasks {
     foreach my $obj (@$objs) {
 	$obj->run();
     }
+    $self->clear_tasks(); # erase the created object list
+}
+
+sub clear_tasks {
+    my ($self) = @_;
+    %{$self->{'tasks'}} = ();
 }
 
 sub get_input {

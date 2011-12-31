@@ -21,6 +21,11 @@ sub start {
 
     my $config = $self->config();
 
+    # don't let a task object start multiple times
+    # (note: multiple objects will be created if multiple:1 is set)
+    return if ($self->{'started'});
+    $self->{'started'} = 1;
+
     $self->set_directory();
 
     # find 'before' childen and execute them entirely
@@ -56,6 +61,9 @@ sub finish {
     my ($self) = @_;
 
     return if ($self->{'stoppedat'});
+
+    return if ($self->{'finished'});
+    $self->{'finished'} = 1;
 
     my $config = $self->config();
 
@@ -95,6 +103,9 @@ sub clean {
 
     return if ($self->{'stoppedat'});
 
+    return if ($self->{'cleaned'});
+    $self->{'cleaned'} = 1;
+
     $self->set_directory();
 
     # final cleanup step calling only our own cleanup function
@@ -132,7 +143,7 @@ sub fail {
 	return 1;
     }
     if ($onfailure eq 'prompt') {
-	my $ans = $self->get_crq("Spot:\t$spot");
+	my $ans = $self->get_crq("Spot:\t\t$spot");
 	if ($ans eq 'q') {
 	    print "Quitting at your your request...\n";
 	    exit(1);
