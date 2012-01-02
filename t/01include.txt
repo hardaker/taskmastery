@@ -5,3 +5,8 @@ include "t/00config.txt"
 
 [after]
   bee=foo
+
+include "t/01include-multi*.txt"
+
+[after2]
+  honey=from bees

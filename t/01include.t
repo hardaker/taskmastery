@@ -23,3 +23,14 @@ ok($config->get('__DEFAULT__', 'bar') eq 'baz',
 ok($config->get('after', 'bee') eq 'foo',
    "the after bee value was foo");
 
+# check the globbed imports
+ok($config->get('multi1', 'foo') eq 'bar',
+   "the multi1 foo value was bar, included by glob");
+
+ok($config->get('multi2', 'foo2') eq 'bar2',
+   "the multi2 foo2 value was bar2, included by glob");
+
+# check that data after the include was accepted
+ok($config->get('after2', 'honey') eq 'from bees',
+   "the after2 honey value was from bees");
+

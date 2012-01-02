@@ -32,27 +32,36 @@ sub read_config {
 }
 
 sub open_file {
-    my ($self, $file, $token, $config_order) = @_;
+    my ($self, $origfile, $token, $config_order) = @_;
 
-    my $fh = new IO::File;
-    if (! $fh->open("< $file")) {
-	print STDERR "failed to open and read $file\n";
-	# XXX: log error
-	return 1;
+    my @files = ($origfile);
+
+    if ($origfile =~ /\*/) {
+	# globbing
+	@files = glob($origfile);
     }
-    while(<$fh>) {
-	next if (/^\s*#/);
-	next if (/^\s*$/);
 
-	if (/^\s*include ["'](.*)["']/) {     # matches "include 'foo'"
-	    $self->open_file($1, $token, $config_order);
-	} elsif (/^\s*\[(.*)\]\s*$/) {	      # matches lines like " [foo] "
-	    $$token = $1;
-	    $self->{'config'}{$$token}{'__order'} = ${$config_order}++;
-	} elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) { # matches lines like foo=bar
-	    $self->{'config'}{$$token}{$1} = $2;
-	} else {
-	    # XXX: broken line???  report this!
+    foreach my $file (@files) {
+	my $fh = new IO::File;
+	if (! $fh->open("< $file")) {
+	    print STDERR "failed to open and read $file\n";
+	    # XXX: log error
+	    return 1;
+	}
+	while(<$fh>) {
+	    next if (/^\s*#/);
+	    next if (/^\s*$/);
+
+	    if (/^\s*include ["'](.*)["']/) {     # matches "include 'foo'"
+		$self->open_file($1, $token, $config_order);
+	    } elsif (/^\s*\[(.*)\]\s*$/) {	      # matches lines like " [foo] "
+		$$token = $1;
+		$self->{'config'}{$$token}{'__order'} = ${$config_order}++;
+	    } elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) { # matches lines like foo=bar
+		$self->{'config'}{$$token}{$1} = $2;
+	    } else {
+		# XXX: broken line???  report this!
+	    }
 	}
     }
     return 0;
