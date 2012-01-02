@@ -4,6 +4,7 @@ use TaskMastery;
 use Carp;
 use strict;
 use Cwd;
+use IO::File;
 
 our @ISA = qw(TaskMastery);
 
@@ -26,20 +27,35 @@ sub read_config {
 
     # read in the config file
     $file ||= "$ENV{HOME}/.taskmastery";
-    
-    open(I, "$file") || croak("failed to open $file");
-    while(<I>) {
+
+    $self->open_file($file, \$token, \$config_order);
+}
+
+sub open_file {
+    my ($self, $file, $token, $config_order) = @_;
+
+    my $fh = new IO::File;
+    if (! $fh->open("< $file")) {
+	print STDERR "failed to open and read $file\n";
+	# XXX: log error
+	return 1;
+    }
+    while(<$fh>) {
 	next if (/^\s*#/);
 	next if (/^\s*$/);
 
-	# matches lines like " [foo] "
-	if (/^\s*\[(.*)\]\s*$/) {
-	    $token = $1;
-	    $self->{'config'}{$token}{'__order'} = $config_order++;
-	} elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) {
-	    $self->{'config'}{$token}{$1} = $2;
+	if (/^\s*include ["'](.*)["']/) {     # matches "include 'foo'"
+	    $self->open_file($1, $token, $config_order);
+	} elsif (/^\s*\[(.*)\]\s*$/) {	      # matches lines like " [foo] "
+	    $$token = $1;
+	    $self->{'config'}{$$token}{'__order'} = ${$config_order}++;
+	} elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) { # matches lines like foo=bar
+	    $self->{'config'}{$$token}{$1} = $2;
+	} else {
+	    # XXX: broken line???  report this!
 	}
     }
+    return 0;
 }
 
 sub get {

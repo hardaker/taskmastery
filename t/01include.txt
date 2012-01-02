@@ -1,0 +1,7 @@
+# defaults
+bar=baz
+
+include "t/00config.txt"
+
+[after]
+  bee=foo
