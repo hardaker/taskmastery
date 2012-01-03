@@ -1,7 +1,11 @@
 
-[parent]
+[test1]
   init=echo -n "p1-" >   t/30-copy-test
   require: i1,i2
+
+[test2]
+  init=echo -n "p1-" >   t/30-copy-test
+  require: i3,i4
 
 [copyfrom]
   type=    command
@@ -17,6 +21,22 @@
   type=    copy
   from=    copyfrom
   execute= echo -n "i2e-" >> t/30-copy-test
+
+[changevalues]
+  type=    command
+  init=    echo -n "cvi-{{FOOBAR}}-" >> t/30-copy-test
+  cleanup= echo -n "cvc-{{FOOBAR}}-" >> t/30-copy-test
+
+[i3]
+  type=    copy
+  from=    changevalues
+  FOOBAR=  foozies
+
+[i4]
+  type=    copy
+  from=    changevalues
+  FOOBAR=  barzies
+  execute= echo -n "ouch-{{FOOBAR}}-" >> t/30-copy-test
 
 [cleanup]
   type:      command

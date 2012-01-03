@@ -13,7 +13,7 @@ sub init {
 
     # transform ourselves into the new object type
     my $config   = $self->config();
-    my $name = $self->name();
+    my $name     = $self->name();
     my $origtype = $config->get($name, 'type');
     my $from     = $config->get($name, 'from');
     my $newtype  = $config->get($from, 'type');
@@ -21,6 +21,10 @@ sub init {
     # copy the config tokens over (and modify them as appropriate)
     foreach my $key (keys(%{$config->{'config'}{$from}})) {
 	$config->{'config'}{$name}{$key} = $config->{'config'}{$from}{$key};
+
+	# replace all {{NAME}} with NAME from the copy definition
+	$config->{'config'}{$name}{$key} =~
+	    s/{{([a-zA-Z][-_\.\,a-z0-9A-Z]*)}}/$config->{'config'}{$name}{$1}/g;
     }
     $config->{'config'}{$name}{'type'} = $newtype;
 
