@@ -61,7 +61,11 @@ sub create_task_object {
     $obj->{'tasks'} = $self->{'tasks'};
 
     # let it do any initialization beyond the new() call
-    $obj->init();
+    # (possibly replacing itself with a new object)
+    my $newobj = $obj->init();
+    if ($newobj) {
+	$obj = $newobj;
+    }
 
     $self->{'tasks'}{$taskname} = $obj;
 
