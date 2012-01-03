@@ -22,7 +22,8 @@ sub read_config {
     $self->{'config'}{$DEFNAME} = {
 	'directory'   => getcwd(),
 	'interactive' => can_be_interactive(),
-	'__order' => $config_order++,
+	'__order'     => $config_order++,
+	'type'        => 'command',
     };
 
     # read in the config file
