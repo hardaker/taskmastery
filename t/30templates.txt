@@ -1,0 +1,24 @@
+
+[parent]
+  init=echo -n "p1-" >   t/30-copy-test
+  require: i1,i2
+
+[copyfrom]
+  type=    command
+  init=    echo -n "cfi1-" >> t/30-copy-test
+  cleanup= echo -n "cfc1-" >> t/30-copy-test
+
+[i1]
+  type=    copy
+  from=    copyfrom
+  execute= echo -n "i1e-" >> t/30-copy-test
+
+# double copy test, copy from i1 which is a copy from 'copyfrom'
+[i2]
+  type=    copy
+  from=    i1
+  execute= echo -n "i2e-" >> t/30-copy-test
+
+[cleanup]
+  type:      command
+  execute:   rm -f t/30-copy-test
