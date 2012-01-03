@@ -1,0 +1,2 @@
+* TODO documentation output showing what will be done in each phase
+* TODO a do-if clause that doesn't question on failure just blocks it
