@@ -6,8 +6,11 @@ use strict;
 our $VERSION = '0.1';
 our %opts = (c => $ENV{'HOME'} . "/.taskmastery");
 
+our %options = ();
+
 LocalGetOptions(\%opts,
 	   ["c|config-file=s","config file to read in (default: ~/.taskmastry)"],
+	   ["n|dry-run",      "dry-run only; just describe what will be done"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
@@ -15,7 +18,11 @@ LocalGetOptions(\%opts,
 my $tm = new TaskMastery();
 $tm->read_config($opts{'c'});
 
-$tm->run_tasks(@ARGV);
+if ($opts{'n'}) {
+    $options{'dryrun'} = "-";
+}
+
+$tm->run_tasks(\%options, @ARGV);
 
 # bootstrapping of Getopt::GUI::Long
 

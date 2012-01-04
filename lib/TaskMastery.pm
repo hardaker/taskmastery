@@ -34,8 +34,9 @@ sub config {
 }
 
 sub create_task_object {
-    my ($self, $taskname) = @_;
+    my ($self, $taskname, $dryrun) = @_;
     my $config = $self->config();
+    my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
 
     if (exists($self->{'tasks'}{$taskname}) &&
 	!$config->get($taskname, 'multiple')) {
@@ -62,7 +63,7 @@ sub create_task_object {
 
     # let it do any initialization beyond the new() call
     # (possibly replacing itself with a new object)
-    my $newobj = $obj->init();
+    my $newobj = $obj->init($dryrun2);
     if ($newobj) {
 	$obj = $newobj;
     }
@@ -90,7 +91,7 @@ sub create_object_of_type {
 }
 
 sub collect_tasks_by_name {
-    my ($self, $tasknames) = @_;
+    my ($self, $tasknames, $dryrun) = @_;
     my @objects;
     my $config = $self->config();
 
@@ -104,13 +105,13 @@ sub collect_tasks_by_name {
 	    foreach my $name (@{$config->get_names()}) {
 		foreach my $tasktag ($config->split($name, 'tag')) {
 		    if ($tasktag eq $tag) {
-			push @objects, $self->create_task_object($name);
+			push @objects, $self->create_task_object($name, $dryrun);
 			last;
 		    }
 		}
 	    }
 	} else {
-	    $obj = $self->create_task_object($taskname);
+	    $obj = $self->create_task_object($taskname, $dryrun);
 	    push @objects, $obj;
 	}
     }
@@ -125,9 +126,20 @@ sub name {
 
 sub run_tasks {
     my ($self, @tasks) = @_;
-    my $objs = $self->collect_tasks_by_name(\@tasks);
+
+    my $dryrun = '';
+    my $options;
+
+    $options = shift @tasks if ($#tasks > -1 && ref($tasks[0]) eq 'HASH');
+
+    if (ref($options) eq 'HASH' && $options->{'dryrun'}) {
+	$dryrun = "-";
+    }
+
+    my $objs = $self->collect_tasks_by_name(\@tasks, $dryrun);
+
     foreach my $obj (@$objs) {
-	$obj->run();
+	$obj->run($dryrun);
     }
     $self->clear_tasks(); # erase the created object list
 }

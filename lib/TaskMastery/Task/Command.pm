@@ -9,40 +9,44 @@ our @ISA = qw(TaskMastery::Task);
 our $VERSION = "0.1";
 
 sub init {
-    my ($self) = @_;
-    return $self->run_commands_for('init');
+    my ($self, $dryrun) = @_;
+    return $self->run_commands_for('init', $dryrun);
 }
 
 sub startup {
-    my ($self) = @_;
-    return $self->run_commands_for('startup');
+    my ($self, $dryrun) = @_;
+    return $self->run_commands_for('startup', $dryrun);
 }
 
 sub execute {
-    my ($self) = @_;
-    return $self->run_commands_for('execute');
+    my ($self, $dryrun) = @_;
+    return $self->run_commands_for('execute', $dryrun);
 }
 
 sub finished {
-    my ($self) = @_;
-    return $self->run_commands_for('finished');
+    my ($self, $dryrun) = @_;
+    return $self->run_commands_for('finished', $dryrun);
 }
 
 sub cleanup {
-    my ($self) = @_;
-    return $self->run_commands_for('cleanup');
+    my ($self, $dryrun) = @_;
+    return $self->run_commands_for('cleanup', $dryrun);
 }
 
 sub run_commands_for {
-    my ($self, $what) = @_;
+    my ($self, $what, $dryrun) = @_;
     my $config = $self->config();
     my $splitter = $config->get($self->name(), 'break') || ";";
     my @commands = $config->split($self->name(), $what, ";");
 
     my $return = 0;
     foreach my $command (@commands) {
-	system($command);
-	$return = 1 if ($? != 0);
+	if (defined($dryrun) && $dryrun ne '') {
+	    $self->dryrun($dryrun, "running: $command");
+	} else {
+	    system($command);
+	    $return = 1 if ($? != 0);
+	}
     }
     return $return;
 }

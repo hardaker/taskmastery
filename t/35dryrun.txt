@@ -1,0 +1,39 @@
+[parent]
+  type:     command
+  before:   beforeparent
+  after:    afterparent
+  require:  parentrequires
+
+  init:     echo -n "1" >  t/35-dryrun-test
+  startup:  echo -n "a" >> t/35-dryrun-test
+  execute:  echo -n "b" >> t/35-dryrun-test
+  finished: echo -n "c" >> t/35-dryrun-test
+  cleanup:  echo -n "k" >> t/35-dryrun-test
+  
+[beforeparent]
+  type:     command
+  init:     echo -n "2" >> t/35-dryrun-test
+  startup:  echo -n "3" >> t/35-dryrun-test 
+  execute:  echo -n "4" >> t/35-dryrun-test
+  finished: echo -n "5" >> t/35-dryrun-test
+  cleanup:  echo -n "6" >> t/35-dryrun-test
+
+[parentrequires]
+  type:     command
+  init:     echo -n "7" >> t/35-dryrun-test
+  startup:  echo -n "8" >> t/35-dryrun-test 
+  execute:  echo -n "9" >> t/35-dryrun-test
+  finished: echo -n "d" >> t/35-dryrun-test
+  cleanup:  echo -n "e" >> t/35-dryrun-test
+
+[afterparent]
+  type:     command
+  init:     echo -n "f" >> t/35-dryrun-test
+  startup:  echo -n "g" >> t/35-dryrun-test 
+  execute:  echo -n "h" >> t/35-dryrun-test
+  finished: echo -n "i" >> t/35-dryrun-test
+  cleanup:  echo -n "j" >> t/35-dryrun-test
+
+[cleanup]
+  type:      command
+  execute:   rm -f t/35-dryrun-test

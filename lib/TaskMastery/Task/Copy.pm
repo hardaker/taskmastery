@@ -9,7 +9,7 @@ our @ISA = qw(TaskMastery::Task);
 our $VERSION = "0.1";
 
 sub init {
-    my ($self) = @_;
+    my ($self, $dryrun) = @_;
 
     # transform ourselves into the new object type
     my $config   = $self->config();
@@ -29,7 +29,7 @@ sub init {
     $config->{'config'}{$name}{'type'} = $newtype;
 
     # create the new object, which will call it's init() routine...
-    my $newobj = $self->create_task_object($name);
+    my $newobj = $self->create_task_object($name, $dryrun);
 
     return $newobj;
 }
