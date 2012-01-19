@@ -34,4 +34,4 @@ silent: 1
 
 [cleanup]
   type:      command
-  execute:   rm -f t/25-multi-test
+  execute:   rm -f t/25-multi-test 

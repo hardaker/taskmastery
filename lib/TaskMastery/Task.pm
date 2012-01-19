@@ -21,6 +21,8 @@ sub start {
 
     my $config = $self->config();
     my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    $self->{'refcount'}++;
+    $self->{'refcleancount'}++;
 
     # don't let a task object start multiple times
     # (note: multiple objects will be created if multiple:1 is set)
@@ -62,6 +64,9 @@ sub start {
 
 sub finish {
     my ($self, $dryrun) = @_;
+
+    $self->{'refcount'}--;
+    return if ($self->{'refcount'} > 0);
 
     return if ($self->{'stoppedat'});
 
@@ -105,6 +110,9 @@ sub finish {
 
 sub clean {
     my ($self, $dryrun) = @_;
+
+    $self->{'refcleancount'}--;
+    return if ($self->{'refcleancount'} > 0);
 
     return if ($self->{'stoppedat'});
 

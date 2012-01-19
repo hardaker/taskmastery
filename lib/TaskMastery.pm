@@ -130,11 +130,17 @@ sub run_tasks {
     my $dryrun = '';
     my $options;
 
+    my $config = $self->config();
+
     $options = shift @tasks if ($#tasks > -1 && ref($tasks[0]) eq 'HASH');
 
     if (ref($options) eq 'HASH' && $options->{'dryrun'}) {
 	$dryrun = "-";
     }
+
+    $config->set("__tm_tmp__", "type", "command");
+    $config->set("__tm_tmp__", "require", join(",",@tasks));
+    @tasks = ("__tm_tmp__");
 
     my $objs = $self->collect_tasks_by_name(\@tasks, $dryrun);
 

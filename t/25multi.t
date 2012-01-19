@@ -9,7 +9,7 @@ $tm->read_config("t/25multi.txt");
 
 $tm->run_tasks('parenttask');
 ok(-f "t/25-multi-test", "startup tag-run worked");
-ok(`cat t/25-multi-test` eq "pi-t1-t2-c1-t1-c2-p-t1f-t1c-t2f-t2c-t1f-t1c-", "content is correct");
+ok(`cat t/25-multi-test` eq "pi-t1-t2-c1-t1-c2-p-t1f-t1c-t1f-t1c-t2f-t2c-", "content is correct");
 
 $tm->run_tasks('cleanup'); 
 ok(! -f "t/25-multi-test", "tag:cleanup command removed the output correctly");
