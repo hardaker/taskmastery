@@ -13,6 +13,7 @@ LocalGetOptions(\%opts,
 	   ["n|dry-run",      "dry-run only; just describe what will be done"],
 	   ["l|list",         "list tasks available with a description"],
 	   ["L|list-all",     "list all the tasks known"],
+	   ["i|interactive",  "interactively select from tasks to run"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
@@ -34,7 +35,30 @@ if ($opts{'n'}) {
     $options{'dryrun'} = "-";
 }
 
-$tm->run_tasks(\%options, @ARGV);
+my @tasks = @ARGV;
+if ($opts{'i'}) {
+    # interactively select tasks
+    my $tasklist = $tm->get_task_list();
+    my $counter = 1;
+    my @tasknames;
+
+    foreach my $task (sort { $a <=> $b } keys(%$tasklist)) {
+	printf("%3d) %-15.15s %s\n", $counter++, $task, $tasklist->{$task});
+	push @tasknames, $task;
+    }
+
+    print "Run which task(s): ";
+    my $ans = <>;
+    chomp($ans);
+
+    my @tasknums = split(/(?:,| )\s*/, $ans);
+    foreach my $tasknum (@tasknums) {
+	next if ($tasknum !~ /^\d+/);
+	push @tasks, $tasknames[$tasknum-1];
+    }
+}
+
+$tm->run_tasks(\%options, @tasks);
 
 # bootstrapping of Getopt::GUI::Long
 

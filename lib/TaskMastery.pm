@@ -199,6 +199,9 @@ sub print_task_list {
     my ($self, $all, $handle) = @_;
     $all = 0 if (!defined($all));
 
+    my $config = $self->config();
+    my $names = $config->get_names();
+
     if (!defined($handle)) {
 	$handle = new IO::Handle;
 	$handle->fdopen(fileno(STDOUT), "w"); # if this fails, we're toast
@@ -213,6 +216,22 @@ sub print_task_list {
 			    $config->{'config'}{$name}{'description'});
 	}
     }
+}
+
+sub get_task_list {
+    my ($self, $all) = @_;
+
+    my %descriptions;
+
+    my $config = $self->config();
+    my $names = $config->get_names();
+
+    foreach my $name (@$names) {
+	if ($all || exists($config->{'config'}{$name}{'description'})) {
+	    $descriptions{$name} = $config->{'config'}{$name}{'description'};
+	}
+    }
+    return \%descriptions;
 }
 
 1;
