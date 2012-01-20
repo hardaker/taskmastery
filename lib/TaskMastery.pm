@@ -196,15 +196,21 @@ sub get_crq {
 }
 
 sub print_task_list {
-    my ($self, $all) = @_;
+    my ($self, $all, $handle) = @_;
     $all = 0 if (!defined($all));
+
+    if (!defined($handle)) {
+	$handle = new IO::Handle;
+	$handle->fdopen(fileno(STDOUT), "w"); # if this fails, we're toast
+    }
+
     my $config = $self->config();
     my $names = $config->get_names();
 
     foreach my $name (@$names) {
 	if ($all || exists($config->{'config'}{$name}{'description'})) {
-	    printf("%-15s %s\n", "$name",
-		   $config->{'config'}{$name}{'description'});
+	    $handle->printf("%-15s %s\n", "$name",
+			    $config->{'config'}{$name}{'description'});
 	}
     }
 }
