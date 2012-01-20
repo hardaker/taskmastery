@@ -11,12 +11,24 @@ our %options = ();
 LocalGetOptions(\%opts,
 	   ["c|config-file=s","config file to read in (default: ~/.taskmastry)"],
 	   ["n|dry-run",      "dry-run only; just describe what will be done"],
+	   ["l|list",         "list tasks available with a description"],
+	   ["L|list-all",     "list all the tasks known"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
 
 my $tm = new TaskMastery();
 $tm->read_config($opts{'c'});
+
+if ($opts{'l'}) {
+    $tm->print_task_list();
+    exit;
+}
+
+if ($opts{'L'}) {
+    $tm->print_task_list(1);
+    exit;
+}
 
 if ($opts{'n'}) {
     $options{'dryrun'} = "-";

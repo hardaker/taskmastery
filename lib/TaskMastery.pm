@@ -195,6 +195,20 @@ sub get_crq {
     }
 }
 
+sub print_task_list {
+    my ($self, $all) = @_;
+    $all = 0 if (!defined($all));
+    my $config = $self->config();
+    my $names = $config->get_names();
+
+    foreach my $name (@$names) {
+	if ($all || exists($config->{'config'}{$name}{'description'})) {
+	    printf("%-15s %s\n", "$name",
+		   $config->{'config'}{$name}{'description'});
+	}
+    }
+}
+
 1;
 
 =pod
