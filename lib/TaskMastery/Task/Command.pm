@@ -33,6 +33,11 @@ sub cleanup {
     return $self->run_commands_for('cleanup', $dryrun);
 }
 
+sub check_skipif {
+    my ($self, $dryrun) = @_;
+    return $self->run_commands_for('skipif', $dryrun);
+}
+
 sub run_commands_for {
     my ($self, $what, $dryrun) = @_;
     my $config = $self->config();

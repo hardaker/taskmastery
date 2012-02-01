@@ -1,0 +1,20 @@
+[parent]
+	require: createstuff, dontcreatestuff, docreatestuff
+
+[createstuff]
+  type: command
+  startup: echo "foo" > t/50-created
+
+[dontcreatestuff]
+  type:    command
+  startup: echo "foo" > t/50-not-created
+  skipif:  test -f t/skipIfTest.txt
+
+[docreatestuff]
+  type:    command
+  startup: echo "foo" > t/50-created-conditionally
+  skipif:  test ! -f t/skipIfTest.txt
+
+[fullclean]
+  type:     command
+  execute:  rm -f t/50-created t/50-not-created t/50-created-conditionally

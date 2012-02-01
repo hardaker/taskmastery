@@ -21,6 +21,12 @@ sub start {
 
     my $config = $self->config();
     my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    if ($self->check_skipif($dryrun2)) {
+	$self->{'stoppedat'} = 1;
+	return 0; # not a failure
+    }
+
+
     $self->{'refcount'}++;
     $self->{'refcleancount'}++;
 
@@ -203,6 +209,7 @@ sub startup  { return 0; }
 sub execute  { return 0; }
 sub finished { return 0; }
 sub cleanup  { return 0; }
+sub skipif   { return 0; }
 
 # XXX: maybe in the future
 sub pretest  { return 0; }
