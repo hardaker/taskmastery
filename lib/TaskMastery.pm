@@ -207,9 +207,6 @@ sub print_task_list {
 	$handle->fdopen(fileno(STDOUT), "w"); # if this fails, we're toast
     }
 
-    my $config = $self->config();
-    my $names = $config->get_names();
-
     foreach my $name (@$names) {
 	if ($all || exists($config->{'config'}{$name}{'description'})) {
 	    $handle->printf("%-15s %s\n", "$name",
