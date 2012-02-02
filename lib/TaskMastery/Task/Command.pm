@@ -35,7 +35,7 @@ sub cleanup {
 
 sub check_skipif {
     my ($self, $dryrun) = @_;
-    return $self->run_commands_for('skipif', $dryrun);
+    return $self->run_commands_for('skipifnot', $dryrun);
 }
 
 sub run_commands_for {
