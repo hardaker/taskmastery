@@ -10,7 +10,7 @@ our @ISA = qw(TaskMastery);
 sub set_directory {
     my ($self) = @_;
     my $config = $self->config();
-    my $directory = $config->get($self->name(), 'directory');
+    my $directory = $self->get_config('directory');
     chdir($directory) if (defined($directory) && $directory ne '');
 }
 
@@ -39,7 +39,7 @@ sub start {
 
     # find 'before' childen and execute them entirely
     $self->{'beforeobjs'} =
-	$self->collect_tasks_by_name([$config->split($self->name(), 'before')],
+	$self->collect_tasks_by_name([$self->split_config('before')],
 				     $dryrun2);
     if (defined($self->{'beforeobjs'})) {
 	foreach my $obj (@{$self->{'beforeobjs'}}) {
@@ -51,7 +51,7 @@ sub start {
 
     # find 'require' childen and execute just their start routines
     $self->{'requireobjs'} =
-	$self->collect_tasks_by_name([$config->split($self->name(), 'require')],
+	$self->collect_tasks_by_name([$self->split_config('require')],
 				     $dryrun2);
     if (defined($self->{'requireobjs'})) {
 	foreach my $obj (@{$self->{'requireobjs'}}) {
@@ -103,7 +103,7 @@ sub finish {
 
     # then call any 'after' tasks and execute them entirely
     $self->{'afterobjs'} =
-	$self->collect_tasks_by_name([$config->split($self->name(), 'after')],
+	$self->collect_tasks_by_name([$self->split_config('after')],
 				     $dryrun2);
     if (defined($self->{'afterobjs'})) {
 	foreach my $obj (@{$self->{'afterobjs'}}) {
@@ -151,8 +151,8 @@ sub fail {
     my ($self, $spot) = @_;
 
     my $config = $self->config();
-    my $onfailure = $config->get($self->name(), 'onfailure', 'prompt');
-    my $silent = $config->get($self->name(), 'silent');
+    my $onfailure = $self->get_config('onfailure', 'prompt');
+    my $silent = $self->get_config('silent');
 
     if (!defined($silent) && $silent ne '1' && $silent ne "yes") {
 	print STDERR "task $self->{name}::$spot failed (action: $onfailure)\n";

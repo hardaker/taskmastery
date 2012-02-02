@@ -14,8 +14,8 @@ sub init {
     # transform ourselves into the new object type
     my $config   = $self->config();
     my $name     = $self->name();
-    my $origtype = $config->get($name, 'type');
-    my $from     = $config->get($name, 'from');
+    my $origtype = $self->get_config('type');
+    my $from     = $self->get_config('from');
     my $newtype  = $config->get($from, 'type');
 
     # copy the config tokens over (and modify them as appropriate)

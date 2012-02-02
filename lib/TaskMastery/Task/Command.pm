@@ -40,9 +40,8 @@ sub check_skipif {
 
 sub run_commands_for {
     my ($self, $what, $dryrun) = @_;
-    my $config = $self->config();
-    my $splitter = $config->get($self->name(), 'break') || ";";
-    my @commands = $config->split($self->name(), $what, ";");
+    my $splitter = $self->get_config('break') || ";";
+    my @commands = $self->split_config($what, ";");
 
     my $return = 0;
     foreach my $command (@commands) {

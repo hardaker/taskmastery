@@ -33,6 +33,16 @@ sub config {
     return $self->{'configobj'};
 }
 
+sub get_config {
+    my $self = shift @_;
+    $self->{'configobj'}->get($self->name(), @_);
+}
+
+sub split_config {
+    my $self = shift @_;
+    $self->{'configobj'}->split($self->name(), @_);
+}
+
 sub create_task_object {
     my ($self, $taskname, $dryrun) = @_;
     my $config = $self->config();
