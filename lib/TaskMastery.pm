@@ -43,10 +43,16 @@ sub split_config {
     $self->{'configobj'}->split($self->name(), @_);
 }
 
+sub get_next_dryrun_flag {
+    my ($self, $dryrunflag) = (@_);
+    return if (!defined($dryrunflag));
+    $dryrunflag = " " . $dryrunflag;
+}
+
 sub create_task_object {
     my ($self, $taskname, $dryrun) = @_;
     my $config = $self->config();
-    my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
 
     if (exists($self->{'tasks'}{$taskname}) &&
 	!$config->get($taskname, 'multiple')) {

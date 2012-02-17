@@ -20,7 +20,7 @@ sub start {
     return if ($self->{'stoppedat'});
 
     my $config = $self->config();
-    my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
     if ($self->check_skipif($dryrun2)) {
 	$self->{'stoppedat'} = 1;
 	return 0; # not a failure
@@ -80,7 +80,7 @@ sub finish {
     $self->{'finished'} = 1;
 
     my $config = $self->config();
-    my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
 
     $self->set_directory();
 
@@ -124,7 +124,7 @@ sub clean {
 
     return if ($self->{'cleaned'});
     $self->{'cleaned'} = 1;
-    my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
 
     $self->set_directory();
 
@@ -136,7 +136,7 @@ sub run {
     my ($self, $dryrun) = @_;
 
     my $config = $self->config();
-    my $dryrun2 = (!defined($dryrun) || $dryrun eq '' ? $dryrun : " " . $dryrun) ;
+    my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
 
     if ($self->start($dryrun2) && $self->fail('start')) {
 	return 1;
