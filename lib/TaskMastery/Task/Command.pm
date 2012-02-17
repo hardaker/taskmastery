@@ -10,6 +10,7 @@ our $VERSION = "0.1";
 
 sub init {
     my ($self, $dryrun) = @_;
+    $self->dryrun($dryrun, "Initializing: $self->{name}") if ($dryrun);
     return $self->run_commands_for('init', $dryrun);
 }
 

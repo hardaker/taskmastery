@@ -21,6 +21,9 @@ sub start {
 
     my $config = $self->config();
     my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
+
+    $self->dryrun($dryrun, "Starting: $self->{name}") if ($dryrun);
+
     if ($self->check_skipif($dryrun2)) {
 	$self->{'stoppedat'} = 1;
 	return 0; # not a failure
@@ -82,6 +85,8 @@ sub finish {
     my $config = $self->config();
     my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
 
+    $self->dryrun($dryrun, "Finishing: $self->{name}") if ($dryrun);
+
     $self->set_directory();
 
     # finish the execution by calling our own finish/cleanup first
@@ -126,6 +131,7 @@ sub clean {
     $self->{'cleaned'} = 1;
     my $dryrun2 = $self->get_next_dryrun_flag($dryrun);
 
+    $self->dryrun($dryrun, "Cleaning: $self->{name}") if ($dryrun);
     $self->set_directory();
 
     # final cleanup step calling only our own cleanup function
