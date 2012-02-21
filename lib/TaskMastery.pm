@@ -45,7 +45,7 @@ sub split_config {
 
 sub get_next_dryrun_flag {
     my ($self, $dryrunflag) = (@_);
-    return if (!defined($dryrunflag));
+    return if (!defined($dryrunflag) || $dryrunflag eq "");
     $dryrunflag = " " . $dryrunflag;
 }
 
