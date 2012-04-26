@@ -166,6 +166,23 @@ sub run_tasks {
     $self->clear_tasks(); # erase the created object list
 }
 
+sub describe_tasks {
+    my ($self, @tasks) = @_;
+
+    my $options;
+
+    my $config = $self->config();
+
+    $options = shift @tasks if ($#tasks > -1 && ref($tasks[0]) eq 'HASH');
+
+    my $objs = $self->collect_tasks_by_name(\@tasks);
+
+    foreach my $obj (@$objs) {
+	$obj->describe();
+    }
+    $self->clear_tasks(); # erase the created object list
+}
+
 sub clear_tasks {
     my ($self) = @_;
     %{$self->{'tasks'}} = ();

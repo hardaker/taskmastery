@@ -56,6 +56,9 @@ sub run_commands_for {
     return $return;
 }
 
+sub describe_keywords {
+    return qw(skipifnot break init startup execute finished cleanup);
+}
 
 1;
 

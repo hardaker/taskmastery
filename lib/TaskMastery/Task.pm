@@ -209,6 +209,57 @@ sub dryrun {
     print $self->dryrun_prefix($dryrun), $msg, "\n";
 }
 
+######################################################################
+# description services
+#
+sub describe {
+    my $self = shift;
+    $self->describe_generic();
+}
+
+sub describe_generic {
+    my $self = shift;
+#    use Data::Dumper;
+#    print Dumper($self);
+    $self->describe_title();
+    $self->describe_contents($self->describe_generic_keywords());
+    $self->describe_contents();
+}
+
+sub describe_title {
+    my $self = shift;
+    print "[$self->{name}]\n";
+    $self->print_keyword('type');
+}
+
+sub describe_contents {
+    my $self = shift;
+    my @keywords = @_;
+    if ($#keywords == -1) {
+	@keywords = $self->describe_keywords();
+    }
+#    print "  # keywords: " . join(", ", @keywords). "\n";
+    foreach my $keyword (@keywords) {
+	if ($self->get_config($keyword)) {
+	    $self->print_keyword($keyword);
+	}
+    }
+}
+
+sub print_keyword {
+    my ($self, $keyword) = @_;
+    printf("  %-15.15s %s\n", $keyword . ":", $self->get_config($keyword));
+}
+
+sub describe_generic_keywords {
+    return qw(directory require before after onfailure silent);
+}
+
+sub describe_keywords {
+    return ();
+}
+
+
 # not used unless over-ridden
 sub init     { return 0; }      # called just after object creation
 sub startup  { return 0; }

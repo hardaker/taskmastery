@@ -14,6 +14,7 @@ LocalGetOptions(\%opts,
 	   ["l|list",         "list tasks available with a description"],
 	   ["L|list-all",     "list all the tasks known"],
 	   ["i|interactive",  "interactively select from tasks to run"],
+	   ["d|describe",     "describe a task"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
@@ -31,9 +32,8 @@ if ($opts{'L'}) {
     exit;
 }
 
-if ($opts{'n'}) {
-    $options{'dryrun'} = "-";
-}
+$options{'dryrun'} = "-" if ($opts{'n'});
+$options{'describe'} = "-" if ($opts{'d'});
 
 my @tasks = @ARGV;
 if ($opts{'i'}) {
@@ -56,6 +56,12 @@ if ($opts{'i'}) {
 	next if ($tasknum !~ /^\d+/);
 	push @tasks, $tasknames[$tasknum-1];
     }
+}
+
+# describe the tasks
+if ($opts{'d'}) {
+    $tm->describe_tasks(\%options, @tasks);
+    exit;
 }
 
 $tm->run_tasks(\%options, @tasks);
