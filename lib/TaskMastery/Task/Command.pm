@@ -44,6 +44,8 @@ sub run_commands_for {
     my $splitter = $self->get_config('break') || ";";
     my @commands = $self->split_config($what, ";");
 
+    $self->set_directory();
+
     my $return = 0;
     foreach my $command (@commands) {
 	if (defined($dryrun) && $dryrun ne '') {
