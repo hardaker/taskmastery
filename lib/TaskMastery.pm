@@ -178,7 +178,7 @@ sub describe_tasks {
     my $objs = $self->collect_tasks_by_name(\@tasks);
 
     foreach my $obj (@$objs) {
-	$obj->describe();
+	$obj->describe($options);
     }
     $self->clear_tasks(); # erase the created object list
 }

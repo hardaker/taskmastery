@@ -191,14 +191,6 @@ sub fail {
     return 0;
 }
 
-# everyone should do this at least
-sub describe {
-    my ($self) = @_;
-    my $subtype = $self;
-    $subtype =~ s/TaskMaster::Task//;
-    carp("The '$subtype' task does not know how to describe itself\n");
-}
-
 sub dryrun_prefix {
     my ($self, $dryrun) = @_;
     return sprintf("%-10.10s %-15.15s ", $dryrun || "", $self->name());
@@ -213,17 +205,31 @@ sub dryrun {
 # description services
 #
 sub describe {
-    my $self = shift;
-    $self->describe_generic();
+    my ($self, $options) = @_;
+    $self->describe_generic($options);
 }
 
 sub describe_generic {
-    my $self = shift;
+    my ($self, $options) = @_;
 #    use Data::Dumper;
 #    print Dumper($self);
     $self->describe_title();
     $self->describe_contents($self->describe_generic_keywords());
     $self->describe_contents();
+    if (defined($options->{'recursive'})) {
+	my $savethis = $options->{'recursive'};
+	$options->{'recursive'} .= $self->{'name'} . " -> ";
+	foreach my $position (qw(before require after)) {
+	    my $objs = $self->collect_tasks_by_name([$self->split_config($position)]);
+	    if (defined($objs) && $#$objs > -1) {
+		print("# $options->{'recursive'} $position\n");
+	    }
+	    foreach my $obj (@$objs) {
+		$obj->describe($options);
+	    }
+	}
+	$options->{'recursive'} = $savethis;
+    }
 }
 
 sub describe_title {
