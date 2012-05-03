@@ -3,6 +3,7 @@ package TaskMastery::Task;
 use TaskMastery;
 use Carp;
 use strict;
+use IO::File;
 
 our $VERSION = "0.1";
 our @ISA = qw(TaskMastery);
@@ -206,7 +207,23 @@ sub dryrun {
 #
 sub describe {
     my ($self, $options) = @_;
-    $self->describe_generic($options);
+    if (defined($options->{'dot'})) {
+	$self->describe_png($options);
+    } else {
+	$self->describe_generic($options);
+    }
+}
+
+sub describe_png {
+    my ($self, $options) = @_;
+    foreach my $position (qw(before require after)) {
+	my $objs = $self->collect_tasks_by_name([$self->split_config($position)]);
+	foreach my $obj (@$objs) {
+	    my $fh = $options->{'dot'};
+	    print $fh "  \"$self->{name}\" -> \"$obj->{name}\"\n";
+	    $obj->describe_png($options);
+	}
+    }
 }
 
 sub describe_generic {
