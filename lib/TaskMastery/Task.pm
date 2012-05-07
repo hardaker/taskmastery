@@ -217,10 +217,16 @@ sub describe {
 sub describe_png {
     my ($self, $options) = @_;
     foreach my $position (qw(before require after)) {
+	my $label;
+	if ($position ne 'require') {
+	    $label = $position;
+	    $label =~ s/(.).*/$1/;
+	    $label = "[label=$label]";
+	}
 	my $objs = $self->collect_tasks_by_name([$self->split_config($position)]);
 	foreach my $obj (@$objs) {
 	    my $fh = $options->{'dot'};
-	    print $fh "  \"$self->{name}\" -> \"$obj->{name}\"\n";
+	    print $fh "  \"$self->{name}\" -> \"$obj->{name}\" $label\n";
 	    $obj->describe_png($options);
 	}
     }
