@@ -1,0 +1,25 @@
+[parent]
+  require: createdirs, createfiles1, createfiles2
+
+[createdirs]
+  type:       command
+  startup:    mkdir t/60-directoryTest
+
+[createfiles1]
+  type:       command
+  directory:  t/60-directoryTest
+  execute:    touch myNewFile1
+
+[createfilestemplate]
+  type:       command
+  directory:  t/60-directoryTest
+
+# ensures the directory property is inherited
+[createfiles2]
+  type:       copy
+  from:       createfilestemplate
+  execute:    touch myNewFile2
+
+[fullclean]
+  type:       command
+  execute:    rm -rf t/60-directoryTest
