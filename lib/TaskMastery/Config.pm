@@ -108,7 +108,9 @@ sub split {
 sub get_names {
     my ($self) = @_;
     my $config = $self->{'config'};
-    return [sort { $config->{$a}{'__order'} <=> $config->{$b}{'__order'} }
+    return [sort {
+	(exists($config->{$a}{'__order'}) ? $config->{$a}{'__order'} : 0) <=>
+	(exists($config->{$b}{'__order'}) ? $config->{$b}{'__order'} : 0) }
 	    keys(%{$config})];
 }
 
