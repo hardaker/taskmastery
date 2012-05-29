@@ -47,18 +47,43 @@ sub run_commands_for {
     $self->set_directory();
 
     my $return = 0;
+
+  allCommands:
     foreach my $command (@commands) {
 	if (defined($dryrun) && $dryrun ne '') {
 	    $self->dryrun($dryrun, "running: $command");
 	} else {
-	    if ($self->get_option('verbose')) {
-		$self->Verbose("* ($self->{'name'}) running: $command\n");
+	    $self->System($what, $command);
+	    my $result = $?;
+
+	  thisCommand:
+	    while ($result != 0) {
+		my $failStatus = $self->fail($what);
+
+		# cehck if we are skipping
+		if ($failStatus == 0) {
+		    next allCommands;
+		}
+
+		# or stopping; either way we're done
+		if ($failStatus == 1) {
+		    return $?;
+		}
+
+		# we should retry (-1) if we get here
+		$self->System($what, $command);
 	    }
-	    system($command);
-	    $return = 1 if ($? != 0);
 	}
     }
     return $return;
+}
+
+sub System {
+    my ($self, $what, $command) = @_;
+    if ($self->get_option('verbose')) {
+	$self->Verbose("* ($self->{'name'}:$what) running: $command\n");
+    }
+    system($command);
 }
 
 sub describe_keywords {
