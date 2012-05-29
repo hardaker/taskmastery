@@ -264,6 +264,11 @@ sub get_task_list {
     return \%descriptions;
 }
 
+sub Verbose {
+    my $self = shift;
+    print STDERR @_;
+}
+
 1;
 
 =pod
