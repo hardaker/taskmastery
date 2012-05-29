@@ -36,11 +36,11 @@ sub cleanup {
 
 sub check_skipif {
     my ($self, $dryrun) = @_;
-    return $self->run_commands_for('skipifnot', $dryrun);
+    return $self->run_commands_for('skipifnot', $dryrun, 1);
 }
 
 sub run_commands_for {
-    my ($self, $what, $dryrun) = @_;
+    my ($self, $what, $dryrun, $failok) = @_;
     my $splitter = $self->get_config('break') || ";";
     my @commands = $self->split_config($what, ";");
 
@@ -55,6 +55,10 @@ sub run_commands_for {
 	} else {
 	    $self->System($what, $command);
 	    my $result = $?;
+
+	    if ($failok) {
+		return $result;
+	    }
 
 	  thisCommand:
 	    while ($result != 0) {
