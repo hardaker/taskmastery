@@ -43,6 +43,17 @@ sub split_config {
     $self->{'configobj'}->split($self->name(), @_);
 }
 
+sub options {
+    my ($self) = @_;
+    return $self->{'options'};
+}
+
+sub get_option {
+    my ($self, $optionname) = @_;
+    return if (!exists($self->{'options'}{$optionname}));
+    return $self->{'options'}{$optionname};
+}
+
 sub get_next_dryrun_flag {
     my ($self, $dryrunflag) = (@_);
     return if (!defined($dryrunflag) || $dryrunflag eq "");
@@ -76,6 +87,7 @@ sub create_task_object {
     $obj->{'configobj'} = $config;
     $obj->{'name'} = $taskname;
     $obj->{'tasks'} = $self->{'tasks'};
+    $obj->{'options'} = $self->{'options'};
 
     # let it do any initialization beyond the new() call
     # (possibly replacing itself with a new object)
@@ -150,8 +162,11 @@ sub run_tasks {
 
     $options = shift @tasks if ($#tasks > -1 && ref($tasks[0]) eq 'HASH');
 
-    if (ref($options) eq 'HASH' && $options->{'dryrun'}) {
-	$dryrun = "-";
+    if (ref($options) eq 'HASH') {
+	if ($options->{'dryrun'}) {
+	    $dryrun = "-";
+	}
+	$self->{'options'} = $options;
     }
 
     $config->set("__tm_tmp__", "type", "command");

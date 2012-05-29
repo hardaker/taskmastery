@@ -12,6 +12,7 @@ our %options = ();
 LocalGetOptions(\%opts,
 	   ["c|config-file=s","config file to read in (default: ~/.taskmastry)"],
 	   ["n|dry-run",      "dry-run only; just describe what will be done"],
+	   ["V|verbose",      "verobse output about the tasks"],
 	   ["i|interactive",  "interactively select from tasks to run"],
 	   ["GUI:separator",  "Describing Tasks"],
 	   ["l|list",         "list tasks available with a description"],
@@ -38,6 +39,7 @@ if ($opts{'L'}) {
 
 $options{'dryrun'} = "-" if ($opts{'n'});
 $options{'describe'} = 1 if ($opts{'d'});
+$options{'verbose'} = 1 if ($opts{'V'});
 $options{'recursive'} = "" if ($opts{'r'} || $opts{'p'});
 if ($opts{'p'}) {
     my ($fh, $name) = tempfile( "taskmasteryXXXXXX", 
