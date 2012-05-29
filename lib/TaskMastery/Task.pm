@@ -159,7 +159,7 @@ sub fail {
 
     my $config = $self->config();
     my $onfailure = $self->get_config('onfailure', 'prompt');
-    my $silent = $self->get_config('silent');
+    my $silent = $self->get_config('silent') || 0;
 
     if (!defined($silent) && $silent ne '1' && $silent ne "yes") {
 	print STDERR "task $self->{name}::$spot failed (action: $onfailure)\n";
