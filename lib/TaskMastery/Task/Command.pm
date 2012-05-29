@@ -51,6 +51,9 @@ sub run_commands_for {
 	if (defined($dryrun) && $dryrun ne '') {
 	    $self->dryrun($dryrun, "running: $command");
 	} else {
+	    if ($self->get_option('verbose')) {
+		$self->Verbose("* ($self->{'name'}) running: $command\n");
+	    }
 	    system($command);
 	    $return = 1 if ($? != 0);
 	}
