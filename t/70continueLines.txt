@@ -1,0 +1,11 @@
+[parent]
+	require: createstuff
+
+[createstuff]
+  type:       command
+  execute:    echo "foo" > t/70-created1 \
+  	      echo "bar" > t/70-created2
+
+[fullclean]
+  type:       command
+  execute:    rm -f t/70-created1 t/70-created2
