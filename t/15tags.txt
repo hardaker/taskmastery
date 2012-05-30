@@ -15,7 +15,7 @@
 [task3]
   type:     command
   execute:  echo -n "c" >> t/15-tag-test
-  tag:      secondtag,atag,anothertag
+  tag:      secondtag,atag;anothertag
 
 [cleanuptask]
   type:     command
