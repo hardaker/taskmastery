@@ -19,8 +19,9 @@ ok(! -f "t/10-startup-cleanup", "startup cleanup removed by cleanup");
 # the true test for proper order execution
 $tm->run_tasks('parent');
 ok(-f "t/10-parent-test", "output file for parent test exists");
-ok(`cat t/10-parent-test` eq "123456789abcdefghijk",
+ok(`cat t/10-parent-test` eq "1*2+3456789abcdefghijk",
    "parent test content is correct");
+system("cp t/10-parent-test /tmp/abc");
 
 $tm->run_tasks('fullclean');
 ok(! -f "t/10-parent-test", "output file for parent test was removed");

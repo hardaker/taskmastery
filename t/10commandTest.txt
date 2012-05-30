@@ -13,7 +13,7 @@
   after:    afterparent
   require:  parentrequires
 
-  init:     echo -n "1" >  t/10-parent-test
+  init:     echo -n "1" >  t/10-parent-test ; echo -n "*" >>  t/10-parent-test
   startup:  echo -n "a" >> t/10-parent-test
   execute:  echo -n "b" >> t/10-parent-test
   finished: echo -n "c" >> t/10-parent-test
@@ -21,7 +21,7 @@
   
 [beforeparent]
   type:     command
-  init:     echo -n "2" >> t/10-parent-test
+  init:     echo -n "2" >> t/10-parent-test ; echo -n "+" >> t/10-parent-test
   startup:  echo -n "3" >> t/10-parent-test 
   execute:  echo -n "4" >> t/10-parent-test
   finished: echo -n "5" >> t/10-parent-test
