@@ -49,6 +49,8 @@ sub open_file {
 	    # XXX: log error
 	    return 1;
 	}
+	
+      readLine:
 	while(<$fh>) {
 	    next if (/^\s*#/);
 	    next if (/^\s*$/);
@@ -60,6 +62,15 @@ sub open_file {
 		$self->{'config'}{$$token}{'__order'} = ${$config_order}++;
 	    } elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) { # matches lines like foo=bar
 		$self->{'config'}{$$token}{$1} = $2;
+		my $what = $2;
+		my $stepName = $1;
+		while ($what =~ s/\\$//) {
+		    $what = <$fh>;
+		    last readLine if (!defined($what));
+
+		    $self->{'config'}{$$token}{$stepName} .=
+			"; " . $what;
+		}
 	    } else {
 		# XXX: broken line???  report this!
 	    }
@@ -101,7 +112,7 @@ sub exact_split {
 
 sub split {
     my ($self, $token, $key, $split) = @_;
-    $split ||= ",";
+    $split ||= "[;,]";
     return ($self->exact_split($token, $key, "\\s*" . $split . "\\s*"));
 }
 
