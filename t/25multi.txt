@@ -32,6 +32,36 @@ silent: 1
   finished:  echo -n "t2f-" >> t/25-multi-test && exit 1
   cleanup:   echo -n "t2c-" >> t/25-multi-test && exit 1
 
+#
+# checking multi-requirement order firing and auto-grouping
+#
+[reqtestbefore]
+  execute:   echo -n "rtbe-" >> t/25-multi-test
+  cleanup:   echo -n "rtbc-" >> t/25-multi-test
+
+[reqtest1]
+  require:   reqtestbefore
+  execute:   echo -n "rt1e-" >> t/25-multi-test
+
+[reqtest2]
+  require:   reqtestbefore
+  execute:   echo -n "rt2e-" >> t/25-multi-test
+
+[reqtestgroup]
+  require:   reqtest1, reqtest2
+
+[reqparent1]
+  require:   reqtest1
+
+[reqparent2]
+  require:   reqtest2
+
+[reqparentgroup]
+  require:   reqparent1, reqparent2
+
+#
+# clean up
+#
 [cleanup]
   type:      command
   execute:   rm -f t/25-multi-test 
