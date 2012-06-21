@@ -110,6 +110,13 @@ sub get_parameter {
     my ($self, $name) = @_;
 
     if (!exists($self->{'parameters'}{$name})) {
+	if ($self->can_be_interactive()) {
+	    my $result = 
+		$self->get_input("Enter a value for parameter \"$name\":\n> ");
+	    $self->{'parameters'}{$name} = $result;
+	} else {
+	    croak("undefinied parameter \"$name\" can't be found\n");
+	}
 	# XXX: prompt
     }
     return $self->{'parameters'}{$name};
