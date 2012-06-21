@@ -50,25 +50,39 @@ sub open_file {
 	    return 1;
 	}
 	
+	my $configToken = 'config';
+
       readLine:
 	while(<$fh>) {
 	    next if (/^\s*#/);
 	    next if (/^\s*$/);
 
-	    if (/^\s*include ["'](.*)["']/) {     # matches "include 'foo'"
+	    if (/^\s*include ["'](.*)["']/) {
+		# matches "include 'foo'"
 		$self->open_file($1, $token, $config_order);
-	    } elsif (/^\s*\[(.*)\]\s*$/) {	  # matches lines like " [foo] "
+
+	    } elsif (/^\s*\[parameter:(.*)\]\s*$/) {
+		# matches lines like " [paramater:foo] "
+		$configToken = 'parameters';
 		$$token = $1;
-		$self->{'config'}{$$token}{'__order'} = ${$config_order}++;
-	    } elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) { # matches lines like foo=bar
-		$self->{'config'}{$$token}{$1} = $2;
+		$self->{$configToken}{$$token}{'__order'} = ${$config_order}++;
+
+	    } elsif (/^\s*\[(.*)\]\s*$/) {
+		# matches lines like " [foo] "
+		$configToken = 'config';
+		$$token = $1;
+		$self->{$configToken}{$$token}{'__order'} = ${$config_order}++;
+
+	    } elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) {
+		# matches lines like foo=bar and foo: bar
+		$self->{$configToken}{$$token}{$1} = $2;
 		my $what = $2;
 		my $stepName = $1;
 		while ($what =~ s/\\$//) {
 		    $what = <$fh>;
 		    last readLine if (!defined($what));
 
-		    $self->{'config'}{$$token}{$stepName} .=
+		    $self->{$configToken}{$$token}{$stepName} .=
 			"; " . $what;
 		}
 	    } else {
@@ -116,9 +130,22 @@ sub get_parameter {
 	    if (exists($self->{'parameters'}{$name}{'description'})) {
 		$line .= "  $self->{'parameters'}{$name}{'description'}\n";
 	    }
-	    my $result = 
-		$self->get_input("$line> ");
-	    $self->{'parameters'}{$name}{'value'} = $result;
+
+	    my $result;
+	    my $first = 1;
+	    do {
+		if (!$first && exists($self->{'parameters'}{$name}{'testerror'})) {
+		    print STDERR "ERROR: $self->{'parameters'}{$name}{'testerror'}\n";
+		}
+		$result = 
+		    $self->get_input("$line> ");
+		$self->{'parameters'}{$name}{'value'} = $result;
+		$first = 0;
+	    } while(exists($self->{'parameters'}{$name}{'test'}) &&
+		    !(eval sprintf("($self->{'parameters'}{$name}{'test'})", $result)));
+	    print "herea: $name -> $result\n";
+	    print "here: " . (eval sprintf("($self->{'parameters'}{$name}{'test'}", $result)) . "\n";
+	    print "here: " . (sprintf("($self->{'parameters'}{$name}{'test'}", $result)) . "\n";
 	} else {
 	    croak("undefinied parameter \"$name\" can't be found\n");
 	}
