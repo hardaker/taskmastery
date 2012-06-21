@@ -96,11 +96,30 @@ sub get {
 
     } else {
 	# finally fall back to the supplied default
-	$result = $default;
+	$result = $default || "";
     }
+
+    # replace [[FOO]] with a parameter value named FOO
+    $result =~ s/\[\[([^\]]+)\]\]/$self->get_parameter($1)/ge;
 
     return $result;
 }    
+
+sub get_parameter {
+    # XXX: determine if interactive or not...
+    my ($self, $name) = @_;
+
+    if (!exists($self->{'parameters'}{$name})) {
+	# XXX: prompt
+    }
+    return $self->{'parameters'}{$name};
+}
+
+sub set_parameter {
+    my ($self, $name, $value) = @_;
+
+    $self->{'parameters'}{$name} = $value;
+}
 
 sub set {
     my ($self, $token, $key, $value) = @_;
