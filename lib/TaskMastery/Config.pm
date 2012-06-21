@@ -120,7 +120,6 @@ sub get {
 }    
 
 sub get_parameter {
-    # XXX: determine if interactive or not...
     my ($self, $name) = @_;
 
     if (!exists($self->{'parameters'}{$name}) ||
@@ -149,7 +148,6 @@ sub get_parameter {
 	} else {
 	    croak("undefinied parameter \"$name\" can't be found\n");
 	}
-	# XXX: prompt
     }
     return $self->{'parameters'}{$name}{'value'};
 }
