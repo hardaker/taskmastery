@@ -130,6 +130,10 @@ sub get_parameter {
 		$line .= "  $self->{'parameters'}{$name}{'description'}\n";
 	    }
 
+	    if (exists($self->{'parameters'}{$name}{'default'})) {
+		$line .= "  [default on enter: \"$self->{'parameters'}{$name}{'default'}\"]\n";
+	    }
+
 	    my $result;
 	    my $first = 1;
 	    do {
@@ -139,12 +143,18 @@ sub get_parameter {
 		$result = 
 		    $self->get_input("$line> ");
 		$self->{'parameters'}{$name}{'value'} = $result;
+		if ($result eq "" && 
+		    exists($self->{'parameters'}{$name}{'default'})) {
+		    $result = $self->{'parameters'}{$name}{'default'};
+		}
 		$first = 0;
 	    } while(exists($self->{'parameters'}{$name}{'test'}) &&
 		    !(eval sprintf("($self->{'parameters'}{$name}{'test'})", $result)));
-	    print "herea: $name -> $result\n";
-	    print "here: " . (eval sprintf("($self->{'parameters'}{$name}{'test'}", $result)) . "\n";
-	    print "here: " . (sprintf("($self->{'parameters'}{$name}{'test'}", $result)) . "\n";
+	} elsif (!exists($self->{'parameters'}{$name}{'value'}) &&
+		 exists($self->{'parameters'}{$name}{'default'})) {
+	    # if non-interactive, use default
+	    $self->{'parameters'}{$name}{'value'} =
+		$self->{'parameters'}{$name}{'default'}
 	} else {
 	    croak("undefinied parameter \"$name\" can't be found\n");
 	}
