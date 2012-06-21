@@ -57,7 +57,7 @@ sub open_file {
 
 	    if (/^\s*include ["'](.*)["']/) {     # matches "include 'foo'"
 		$self->open_file($1, $token, $config_order);
-	    } elsif (/^\s*\[(.*)\]\s*$/) {	      # matches lines like " [foo] "
+	    } elsif (/^\s*\[(.*)\]\s*$/) {	  # matches lines like " [foo] "
 		$$token = $1;
 		$self->{'config'}{$$token}{'__order'} = ${$config_order}++;
 	    } elsif (/^\s*(\w+)\s*[:=]\s*(.*)/) { # matches lines like foo=bar
