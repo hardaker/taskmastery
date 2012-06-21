@@ -227,7 +227,7 @@ sub get_crq {
 
     while (1) {
 	my $input =
-	    $self->get_input($prompt || "Retry, Continue, Stop this task, Quit (r,c,s,q): ");
+	    $self->get_input($prompt || "(R)etry, (C)ontinue, (S)top this task, (Q)uit (r,c,s,q): ");
 	if ($validitytest) {
 	    $input =~ lc($input);
 	    if ($input =~ /$validitytest/) {
