@@ -83,19 +83,23 @@ sub get {
     my ($self, $token, $key, $default) = @_;
     return if (!exists($self->{'config'}{$token})); # don't auto-create
 
-    # return the value if we have it
+    my $result;
+
     if (exists($self->{'config'}{$token}{$key})) {
-	return $self->{'config'}{$token}{$key};
-    }
+	# return the value if we have it
+	$result = $self->{'config'}{$token}{$key};
 
-    # else fall back to a default value, if possible
-    if (exists($self->{'config'}{$DEFNAME}) &&
+    } elsif (exists($self->{'config'}{$DEFNAME}) &&
 	exists($self->{'config'}{$DEFNAME}{$key})) {
-	return $self->{'config'}{$DEFNAME}{$key};
+	# else fall back to a system-wide default value, if possible
+	$result = $self->{'config'}{$DEFNAME}{$key};
+
+    } else {
+	# finally fall back to the supplied default
+	$result = $default;
     }
 
-    # finally fall back to the supplied default
-    return $default;
+    return $result;
 }    
 
 sub set {
