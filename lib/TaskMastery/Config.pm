@@ -109,23 +109,24 @@ sub get_parameter {
     # XXX: determine if interactive or not...
     my ($self, $name) = @_;
 
-    if (!exists($self->{'parameters'}{$name})) {
+    if (!exists($self->{'parameters'}{$name}) ||
+	!exists($self->{'parameters'}{$name}{'value'})) {
 	if ($self->can_be_interactive()) {
 	    my $result = 
 		$self->get_input("Enter a value for parameter \"$name\":\n> ");
-	    $self->{'parameters'}{$name} = $result;
+	    $self->{'parameters'}{$name}{'value'} = $result;
 	} else {
 	    croak("undefinied parameter \"$name\" can't be found\n");
 	}
 	# XXX: prompt
     }
-    return $self->{'parameters'}{$name};
+    return $self->{'parameters'}{$name}{'value'};
 }
 
 sub set_parameter {
     my ($self, $name, $value) = @_;
 
-    $self->{'parameters'}{$name} = $value;
+    $self->{'parameters'}{$name}{'value'} = $value;
 }
 
 sub set {
