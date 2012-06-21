@@ -45,8 +45,7 @@ sub open_file {
     foreach my $file (@files) {
 	my $fh = new IO::File;
 	if (! $fh->open("< $file")) {
-	    print STDERR "failed to open and read $file\n";
-	    # XXX: log error
+	    print STDERR "failed to open and read config file: $file\n";
 	    return 1;
 	}
 	
@@ -91,6 +90,30 @@ sub open_file {
 	}
     }
     return 0;
+}
+
+sub read_parameters {
+    # paremeter values are stored in much more simple foo: bar expressions
+    # (ie, no sections and sub-keywords)
+
+    my ($self, $file) = @_;
+    my $fh = new IO::File;
+    if (! $fh->open("< $file")) {
+	print STDERR "failed to open and read parameter file: $file\n";
+	return 1;
+    }
+    
+    while(<$fh>) {
+	next if (/^\s*#/);
+	next if (/^\s*$/);
+
+	if (/^\s*(\w+)\s*[:=]\s*(.*)/) {
+	    # matches lines like foo=bar and foo: bar
+	    $self->{'parameters'}{$1}{'value'} = $2;
+	} else {
+	    # XXX: broken line???  report this!
+	}
+    }
 }
 
 sub get {

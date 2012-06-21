@@ -5,12 +5,14 @@ use File::Temp qw/ tempfile /;
 use strict;
 
 our $VERSION = '0.1';
-our %opts = (c => $ENV{'HOME'} . "/.taskmastery");
+our %opts = (c => $ENV{'HOME'} . "/.taskmastery",
+	     p => $ENV{'HOME'} . "/.taskmasteryrc");
 
 our %options = ();
 
 LocalGetOptions(\%opts,
 	   ["c|config-file=s","config file to read in (default: ~/.taskmastry)"],
+	   ["p|parameter-file=s","parameter file to read in (default: ~/.taskmastryrc)"],
 	   ["n|dry-run",      "dry-run only; just describe what will be done"],
 	   ["V|verbose",      "verobse output about the tasks"],
 	   ["i|interactive",  "interactively select from tasks to run"],
@@ -19,12 +21,13 @@ LocalGetOptions(\%opts,
 	   ["L|list-all",     "list all the tasks known"],
 	   ["d|describe",     "describe a task"],
 	   ["r|describe-recursively",     "describe a task and sub-tasks"],
-	   ["p|png-file=s",               "create a dot graph PNG file"],
+	   ["P|png-file=s",               "create a dot graph PNG file"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
 
 my $tm = new TaskMastery();
+$tm->read_parameters($opts{'p'}) if (-f $opts{'p'});
 $tm->read_config($opts{'c'});
 
 if ($opts{'l'}) {
@@ -40,8 +43,8 @@ if ($opts{'L'}) {
 $options{'dryrun'} = "-" if ($opts{'n'});
 $options{'describe'} = 1 if ($opts{'d'});
 $options{'verbose'} = 1 if ($opts{'V'});
-$options{'recursive'} = "" if ($opts{'r'} || $opts{'p'});
-if ($opts{'p'}) {
+$options{'recursive'} = "" if ($opts{'r'} || $opts{'P'});
+if ($opts{'P'}) {
     my ($fh, $name) = tempfile( "taskmasteryXXXXXX", 
 				SUFFIX => '.dot',
 				DIR => '/tmp');
@@ -76,10 +79,10 @@ if ($opts{'i'}) {
 }
 
 # describe the tasks
-if ($opts{'d'} || $opts{'r'} || $opts{'p'}) {
+if ($opts{'d'} || $opts{'r'} || $opts{'P'}) {
     $tm->describe_tasks(\%options, @tasks);
 
-    if ($opts{'p'}) {
+    if ($opts{'P'}) {
 	my $fh = $options{'dot'};
 	print $fh "}\n";
 	system("dot -Tpng -o$opts{p} $options{'dotfile'}");
