@@ -13,6 +13,7 @@ our %options = ();
 LocalGetOptions(\%opts,
 	   ["c|config-file=s","config file to read in (default: ~/.taskmastry)"],
 	   ["p|parameter-file=s","parameter file to read in (default: ~/.taskmastryrc)"],
+	   ["P|parameter-list=s","pass a list of comma separated parameters"],
 	   ["n|dry-run",      "dry-run only; just describe what will be done"],
 	   ["V|verbose",      "verobse output about the tasks"],
 	   ["i|interactive",  "interactively select from tasks to run"],
@@ -21,13 +22,23 @@ LocalGetOptions(\%opts,
 	   ["L|list-all",     "list all the tasks known"],
 	   ["d|describe",     "describe a task"],
 	   ["r|describe-recursively",     "describe a task and sub-tasks"],
-	   ["P|png-file=s",               "create a dot graph PNG file"],
+	   ["png|png-file=s", "create a dot graph PNG file"],
 	   ["GUI:VERSION", $VERSION],
 	   ["GUI:otherargs_text", "[TASKS... or TAG:TAGNAME]"],
 	  ) || exit;
 
 my $tm = new TaskMastery();
+
+# read and load the parameter file and command line over-rides
 $tm->read_parameters($opts{'p'}) if (-f $opts{'p'});
+if ($opts{'P'}) {
+    my @list = split(/,\s*/, $opts{'P'});
+    foreach my $item (@list) {
+	my ($key, $value) = ($item =~ /^\s*(\w+)\s*[:=]\s*(.*)/);
+	$tm->set_parameter($key, $value);
+    }
+}
+
 $tm->read_config($opts{'c'});
 
 if ($opts{'l'}) {
@@ -43,8 +54,8 @@ if ($opts{'L'}) {
 $options{'dryrun'} = "-" if ($opts{'n'});
 $options{'describe'} = 1 if ($opts{'d'});
 $options{'verbose'} = 1 if ($opts{'V'});
-$options{'recursive'} = "" if ($opts{'r'} || $opts{'P'});
-if ($opts{'P'}) {
+$options{'recursive'} = "" if ($opts{'r'} || $opts{'png'});
+if ($opts{'png'}) {
     my ($fh, $name) = tempfile( "taskmasteryXXXXXX", 
 				SUFFIX => '.dot',
 				DIR => '/tmp');
@@ -79,10 +90,10 @@ if ($opts{'i'}) {
 }
 
 # describe the tasks
-if ($opts{'d'} || $opts{'r'} || $opts{'P'}) {
+if ($opts{'d'} || $opts{'r'} || $opts{'png'}) {
     $tm->describe_tasks(\%options, @tasks);
 
-    if ($opts{'P'}) {
+    if ($opts{'png'}) {
 	my $fh = $options{'dot'};
 	print $fh "}\n";
 	system("dot -Tpng -o$opts{p} $options{'dotfile'}");

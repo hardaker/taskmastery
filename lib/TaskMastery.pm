@@ -20,24 +20,38 @@ sub new {
     return $self;
 }
 
-sub read_config {
-    my ($self, $file) = @_;
+sub setup_config {
+    my ($self) = @_;
     if (!defined($self->{'configobj'})) {
 	$self->{'configobj'} = new TaskMastery::Config;
     }
-    $self->{'configobj'}->read_config($file);
+}
+
+sub read_config {
+    my ($self, $file) = @_;
+    $self->setup_config();
+    $self->config()->read_config($file);
 }
 
 sub read_parameters {
     my ($self, $file) = @_;
-    if (!defined($self->{'configobj'})) {
-	$self->{'configobj'} = new TaskMastery::Config;
-    }
-    $self->{'configobj'}->read_parameters($file);
+    $self->setup_config();
+    $self->config()->read_parameters($file);
+}
+
+sub set_parameter {
+    my ($self, $item, $value) = @_;
+    $self->config()->set_parameter($item, $value);
+}
+
+sub get_parameter {
+    my ($self, $item) = @_;
+    return $self->config()->get_parameter($item);
 }
 
 sub config {
     my ($self) = @_;
+    $self->setup_config();
     return $self->{'configobj'};
 }
 
