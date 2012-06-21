@@ -112,8 +112,12 @@ sub get_parameter {
     if (!exists($self->{'parameters'}{$name}) ||
 	!exists($self->{'parameters'}{$name}{'value'})) {
 	if ($self->can_be_interactive()) {
+	    my $line = "Enter a value for parameter \"$name\":\n";
+	    if (exists($self->{'parameters'}{$name}{'description'})) {
+		$line .= "  $self->{'parameters'}{$name}{'description'}\n";
+	    }
 	    my $result = 
-		$self->get_input("Enter a value for parameter \"$name\":\n> ");
+		$self->get_input("$line> ");
 	    $self->{'parameters'}{$name}{'value'} = $result;
 	} else {
 	    croak("undefinied parameter \"$name\" can't be found\n");
