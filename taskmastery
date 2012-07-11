@@ -67,7 +67,7 @@ if ($opts{'png'}) {
 }
 
 my @tasks = @ARGV;
-if ($opts{'i'}) {
+if ($opts{'i'} || $#tasks == -1) {
     # interactively select tasks
     my $tasklist = $tm->get_task_list();
     my $counter = 1;
