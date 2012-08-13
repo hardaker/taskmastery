@@ -25,12 +25,6 @@ sub start {
 
     $self->dryrun($dryrun, "Starting: $self->{name}") if ($dryrun);
 
-    if ($self->check_skipif($dryrun2)) {
-	$self->{'stoppedat'} = 1;
-	return 0; # not a failure
-    }
-
-
     $self->{'refcount'}++;
     $self->{'refcleancount'}++;
 
@@ -38,6 +32,11 @@ sub start {
     # (note: multiple objects will be created if multiple:1 is set)
     return if ($self->{'started'});
     $self->{'started'} = 1;
+
+    if ($self->check_skipif($dryrun2)) {
+	$self->{'stoppedat'} = 1;
+	return 0; # not a failure
+    }
 
     $self->set_directory();
 
