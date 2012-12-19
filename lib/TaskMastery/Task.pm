@@ -244,7 +244,7 @@ sub describe_generic {
 	foreach my $position (qw(before require after)) {
 	    my $objs = $self->collect_tasks_by_name([$self->split_config($position)]);
 	    if (defined($objs) && $#$objs > -1) {
-		print("# $options->{'recursive'} $position\n");
+		print("\n# $options->{'recursive'} $position\n");
 	    }
 	    foreach my $obj (@$objs) {
 		$obj->describe($options);
@@ -252,6 +252,7 @@ sub describe_generic {
 	}
 	$options->{'recursive'} = $savethis;
     }
+    print "\n";
 }
 
 sub describe_title {
