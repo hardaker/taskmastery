@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Wes Hardaker
+# Copyright (C) 2011-2013 Wes Hardaker
 # License: GNU GPLv2.  See the COPYING file for details.
 #!/usr/bin/perl
 
