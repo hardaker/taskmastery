@@ -281,7 +281,7 @@ sub print_keyword {
 }
 
 sub describe_generic_keywords {
-    return qw(directory require before after onfailure silent);
+    return qw(directory require before after onfailure silent tag);
 }
 
 sub describe_keywords {
