@@ -24,7 +24,7 @@ sub init {
 
 	# replace all {{NAME}} with NAME from the copy definition
 	$config->{'config'}{$name}{$key} =~
-	    s/{{([a-zA-Z][-_\.\,a-z0-9A-Z]*)}}/$config->{'config'}{$name}{$1}/g;
+	    s/\{\{([a-zA-Z][-_\.\,a-z0-9A-Z]*)\}\}/$config->{'config'}{$name}{$1}/g;
     }
     $config->{'config'}{$name}{'type'} = $newtype;
 
