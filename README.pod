@@ -1,0 +1,141 @@
+=pod
+
+=head1 NAME
+
+taskmastery - Organize, serialize and depend on a set of tasks
+
+=head1 SYNOPSIS
+
+ # cat > $HOME/.taskmastery << EOF
+ [hello]
+   execute: echo "hello"
+ 
+ [testtask]
+   execute: echo "world"
+   require: hello
+ 
+ EOF
+
+ # taskmastery testtask
+ hello
+ world
+
+=head1 TASK DEFINITION FILE
+
+By default tasks are defined in I<$HOME/.taskmastery>, although the
+I<-c> flag can be used to point to any file.
+
+=head2 Task Names
+
+Each task begins with a I<task name> defined in square brackets.
+
+  [my task name]
+
+=head2 Task Parameter Formatting
+
+Directives for the task are given after that, and can be a keyword
+token followed by either a colon (:) or equal sign (=).
+
+  [my task name]
+  type: command
+  execute = echo "hello world"
+
+White space will be stripped before and after the separator so white
+space formatting can be done as needed.
+
+=head2 Task Types
+
+All tasks exist as a certain B<type>, which are defined further in a
+later section.  If no type is specified, the type defaults to
+I<command>.
+
+=head2 Include directives
+
+A single line beginning with the keyword "include" is treated as an
+include directive and may contain a glob pattern.  For example, the
+author's I<~/.taskmastery> file consists mostly of:
+
+  include "/home/hardaker/lib/taskmastery/*.ini"
+
+Which causes B<taskmastery> to load all the I<.ini> files in the above directory.
+
+=head2 Parameters
+
+Special sections may exist to define a I<parameter>, which is a
+glorified variable name that when found in a task definition will
+cause the user to be prompted for a value for the given variable.
+Parameters are invoked within square brackets (I<[]>) within a task
+definition.  Parameters that are encountered that do not have an
+associated formal definition will be prompted for with just the
+parameter name provided to the user.
+
+  [parameter:testParameter1]
+      description: Enter value number 1:
+  
+  [multiply]
+      execute: echo "[[testParameter1]] * [[testParameter2]]" | bc
+
+And when run it looks like:
+
+  # taskmastery multiply
+  Enter a value for parameter "testparameter1":
+    Enter value number 1:
+  >  2
+  Enter a value for parameter "testparameter2":
+  >  4
+  8
+
+=head3 Parmeter Legality Tests
+
+A I<test> description may also be given which will be evaluated in
+perl to determine if the value supplied by the user is legal.  The
+value will be placed into a any %s within the test.  If the test
+fails, the user will be prompted for a new value to use.  If a
+I<testerror> description is available, that text will be shown to the
+user before the reprompt.
+
+  [parameter:testparameter1]
+      description: Enter value number 1:
+      test:        "%s" =~ /^\d+$/
+      testerror:   Value must be a integer number
+
+  [parameter:getafile]
+      description: Enter a path to a file
+      test:        -f "%s"
+      testerror:   Please supply a path to an existing file
+
+=head2 Task Tags
+
+...
+
+=head1 Task Types
+
+This section lists the various task types available for use.
+
+=head2 Command Tasks
+
+Command types execute the commands listed at each of the I<execution
+times>.  Commands may be separated with semi-colons or with
+newline/backslash separators.
+
+  [mycommand]
+  execute: echo "1" ; echo "2" \
+           echo "3"
+
+Any command which is invoked and fails will result in a prompt where
+the user will have the choice to I<(R)etry, (C)ontinue, (S)top this
+task, or (Q)uit>
+
+=head1 Copy Tasks
+
+...
+
+=head1 AUTHOR
+
+Wes Hardaker < opensource AT hardakers DOT net >
+
+=head1 LICENSING
+
+This software is Copyright 2012-2013 by Wes hardaker and released on the
+GNU Public License Version 2.  Please see the LICENSE file distributed
+with the sourcecode for taskmastery.
